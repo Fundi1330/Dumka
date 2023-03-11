@@ -18,6 +18,10 @@ def sing_in():
 def log_in():
     return render_template('log_in.html')  #тут Христині треба html файл зробить
 
-@app.route('/public')
+@app.route('/public') #публікація
 def public():
     return render_template('public.html')  # тут Христині треба html файл зробить
+
+@app.route('/user/<username>') #декоратор для перегляду профілю
+def user(username):
+    return render_template('user.html')
