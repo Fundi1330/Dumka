@@ -5,7 +5,8 @@ app = Flask(__name__)
 app.config['SELECT_KEY'] = '1234'
 
 @app.route('/') #Головна сторінка
-def golovna():
+@app.route('/index')
+def main():
     form = 'Це головна сторінка'
     return render_template('index.html', form=form)     #тут Христині треба html файл зробить
 
@@ -25,3 +26,7 @@ def public():
 @app.route('/user/<username>') #декоратор для перегляду профілю
 def user(username):
     return render_template('user.html')
+
+@app.route('/kind/<subreddit>') #Сабреддіт
+def kind(subreddit):
+    return render_template('kind.html')
