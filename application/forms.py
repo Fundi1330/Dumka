@@ -7,21 +7,21 @@ from hashlib import md5
 
 class SingUp(FlaskForm):  # Для реєстрації, треба html
     name = StringField('Name', validators=[DataRequired()])
-    username = StringField('Username', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
+    username = StringField('Username', validators=[DataRequired('Не мже бути пусте')])
+    password = PasswordField('Password', validators=[DataRequired('Не мже бути пусте')])
     email = StringField('Email', validators=[DataRequired(), Email()])
     remember_me = BooleanField('Remember Me!')
 
 
 class Login(FlaskForm):  # Для входу, треба html
     username = StringField('Username', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired('Не мже бути пусте')])
 
 
 class EditForm(FlaskForm):  # Для того щоб миняти імя и тд треба бд
     username = StringField('Username', validators=[DataRequired()])
     about_me = TextAreaField('about_me', validators=[Length(min=0, max=140)])
-    submit = SubmitField('Submit')  # Button
+    submit = SubmitField('Submit')  # Кнопка
 
     def avatar(self, size):
         return """Силка на фото""" + md5(self.email).hexdigest() + '?d=mm&s=' + str(size)
@@ -29,6 +29,11 @@ class EditForm(FlaskForm):  # Для того щоб миняти імя и тд
 
 class EditFormprivat(FlaskForm):  # Теж треба бд
     username = StringField('Username', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired('Не мже бути пусте')])
     email = StringField('Email', validators=[DataRequired(), Email()])
-    submit = SubmitField('Submit')  # Button
+    submit = SubmitField('Submit')  # Кнопка
+
+
+class Posts(FlaskForm):     #Треба бд для додавання постів та коментів
+    posts = TextAreaField('Post', validators=[Length(min=0, max=140)])
+    comets = TextAreaField('Comment', validators=[Length(min=0, max=300)])
