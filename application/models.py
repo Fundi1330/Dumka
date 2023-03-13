@@ -4,7 +4,7 @@ db = SQLAlchemy()
 
 
 class User(db.Model):
-    tablename = '__User__'
+    __tablename__ = 'User'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, index=True)
     username = db.Column(db.String(120), index=True, unique=True)
@@ -17,7 +17,7 @@ class User(db.Model):
         return '<User {}'.format(self.username)
 
 class Post(db.Model):
-    tablename = '__Post__'
+    __tablename__ = 'Post'
     id = db.Column(db.Integer, primary_key=True)
     theme = db.Column(db.String)
     tag = db.Column(db.String, index=True)
@@ -25,14 +25,14 @@ class Post(db.Model):
 
 
     def __repr__(self) -> str:
-        return '<Post {}'.format(self.body)
+        return '<Post {}'.format(self.author)
 
 
 class Community(db.Model):
-    tablename = '__Community__'
+    __tablename__ = 'Community'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, index=True)
 
 
     def __repr__(self) -> str:
-        return f'name: {self.name}, price: {self.price}'
+        return '<Community {}'.format(self.name)
