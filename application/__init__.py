@@ -29,4 +29,4 @@ def user(username):
 
 @app.route('/kind/<subreddit>') #Сабреддіт
 def kind(subreddit):
-    return render_template('kind.html')
+    return render_template('kind.html') #Треба html файл
