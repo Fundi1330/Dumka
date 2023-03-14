@@ -19,6 +19,9 @@ class Login(FlaskForm):  # Для входу, треба html
 
 
 class EditForm(FlaskForm):  # Для того щоб миняти імя и тд треба бд
+    #бд
+
+
     username = StringField('Username', validators=[DataRequired()])
     about_me = TextAreaField('about_me', validators=[Length(min=0, max=140)])
     submit = SubmitField('Submit')  # Кнопка
@@ -28,6 +31,9 @@ class EditForm(FlaskForm):  # Для того щоб миняти імя и тд
 
 
 class EditFormprivat(FlaskForm):  # Теж треба бд
+    #бд
+
+
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired('Не мже бути пусте')])
     email = StringField('Email', validators=[DataRequired(), Email()])
@@ -35,5 +41,12 @@ class EditFormprivat(FlaskForm):  # Теж треба бд
 
 
 class Posts(FlaskForm):     #Треба бд для додавання постів та коментів
-    posts = TextAreaField('Post', validators=[Length(min=0, max=140)])
+    # бд
+
+    title = TextAreaField('Title', validators=[Length(min=0, max=130)])
+    posts = TextAreaField('Post', validators=[Length(min=0, max=350)])
+    tag = TextAreaField('Tag', validators=Length(min=0, max=100))
+
+
+class Comment(FlaskForm):
     comets = TextAreaField('Comment', validators=[Length(min=0, max=300)])
