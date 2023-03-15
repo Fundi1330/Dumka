@@ -25,7 +25,7 @@ class Post(db.Model):
     __tablename__ = 'Post'
     id = db.Column(db.Integer, primary_key=True)
     theme = db.Column(db.String)
-    tag = db.Column(db.String, index=True)
+    tags = db.Column(db.String, index=True)
     author = db.Column(db.String, index=True)
 
 

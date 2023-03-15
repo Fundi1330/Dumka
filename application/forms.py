@@ -6,21 +6,21 @@ from hashlib import md5
 
 class Registration(FlaskForm):  # Для реєстрації, треба html
     name = StringField('Імя', validators=[DataRequired()])
-    nickname = StringField('Користувач', validators=[DataRequired('Не мже бути пусте')])
+    username = StringField('Користувач', validators=[DataRequired('Не мже бути пусте')])
     password = PasswordField('Пароль', validators=[DataRequired('Не мже бути пусте')])
     email = StringField('Почта', validators=[DataRequired(), Email()])
-    remember_me = BooleanField('Запамятай мене!')
     submit = SubmitField('Підтвердити')
 
 class Login(FlaskForm):  # Для входу, треба html
-    nickname = StringField('Користувач', validators=[DataRequired()])
+    username = StringField('Користувач', validators=[DataRequired()])
     password = PasswordField('Пароль', validators=[DataRequired('Не мже бути пусте')])
+    remember_me = BooleanField('Запамятай мене!')
     submit = SubmitField('Підтвердити')
 
 class EditForm(FlaskForm):  # Для того щоб миняти імя и тд треба бд
     # бд
 
-    nickname = StringField('Користувач', validators=[DataRequired()])
+    name = StringField('Користувач', validators=[DataRequired()])
     about_me = TextAreaField('Про мене', validators=[Length(min=0, max=140)])
     submit = SubmitField('Підтвердити')  # Кнопка
 
@@ -34,7 +34,7 @@ class EditFormPrivat(FlaskForm):  # Теж треба бд
     # бд
 
 
-    nickname = StringField('Користувач', validators=[DataRequired()])
+    username = StringField('Користувач', validators=[DataRequired()])
     password = PasswordField('Пароль', validators=[DataRequired('Не мже бути пусте')])
     email = StringField('Почта', validators=[DataRequired(), Email()])
     submit = SubmitField('Підтвердити')  # Кнопка

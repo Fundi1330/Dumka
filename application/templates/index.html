@@ -24,14 +24,19 @@
     </section>
     <section class="recomended">
         {% for community in recomended_communities %}
-            <h2 class="recomended__item">community.name</h2>
-            <p class="recomended__item">comminity.desc</p>
+            <div>
+                <h2 class="recomended__item">{{ community.name }}</h2>
+            </div>
+            <!-- <p class="recomended__item">comminity.desc</p> -->
         {% endfor %}
     </section>
     <section class="posts">
+        <h1>Posts:</h1>
         {% for post in posts %}
-            <h3 class="post__header">post.header</h3>
-            <p class="post__body">post.body</p>
+            <h3 class="post__header">{{ post.theme }}</h3>
+            <p class="post__body">
+                {{ post.tags }}
+            </p>
         {% endfor %}
     </section>
 {% endblock %}

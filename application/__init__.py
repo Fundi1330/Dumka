@@ -24,24 +24,24 @@ def load_user(id):
     return User.query.get(int(id))
 
 
-@app.route('/') #Головна сторінка
-@app.route('/index')
+@app.route('/', methods=['GET', 'POST']) #Головна сторінка
+@app.route('/index', methods=['GET', 'POST'])
 def main():
     posts = Post.query.all()
     recomended_communities = Community.query.all()
     form = PostForm()
-    if form.validate_on_submit():
+    if form.validate_on_submit() and current_user.is_authenticated:
         post = Post(theme=form.title.data, tag=form.tag.data, author=current_user.username)
         db.session.add(post)
         db.session.commit()
-    return render_template('index.html', title='Reddit', post=posts, recomended_communities=recomended_communities, form=form)
+    return render_template('index.html', title='Reddit', posts=posts, recomended_communities=recomended_communities, form=form)
 
 
 @app.route('/sing_in', methods=['GET', 'POST']) #Реєстрація
 def sing_up():
     form = Registration()
     if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data, password_hash=form.password.data )
+        user = User(name=form.name.data, username=form.username.data, email=form.email.data, password_hash=form.password.data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
