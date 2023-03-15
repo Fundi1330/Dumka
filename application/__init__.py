@@ -1,7 +1,7 @@
 from flask import Flask, render_template, flash, redirect, url_for
-from .forms import SingUp, Login
+from application.forms import SingUp, Login
 from flask_login import current_user, LoginManager, login_user,
-from .models import User, Post, Community
+from application.models import User, Post, Community
 
 app = Flask(__name__)
 
