@@ -2,7 +2,25 @@
 
 {% block content %}
     <section class="write__post">
-        <form action="" method="post"></form>
+        <form action="" method="post">
+            {{ form.hidden_tag() }}
+            {{ form.title.label }}
+            {{ form.title(class_='form__input') }}
+            {% for error in form.label.errors %}
+                <p style="color: red;">[{{error}}]</p>
+            {% endfor %}
+            {{ form.posts.label }}
+            {{ form.posts(class_='form__input') }}
+            {% for error in form.posts.errors %}
+                <p style="color: red;">[{{error}}]</p>
+            {% endfor %}
+            {{ form.tag.label }}
+            {{ form.tag(class_='form__input') }}
+            {% for error in form.tag.errors %}
+                <p style="color: red;">[{{error}}]</p>
+            {% endfor %}
+            {{ form.submit(class_='form__submit')}}
+        </form>
     </section>
     <section class="recomended">
         {% for community in recomended_communities %}
