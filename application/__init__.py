@@ -1,8 +1,9 @@
 from flask import Flask, render_template, flash, redirect, url_for
 from application.forms import SingUp, Login
 from flask_login import current_user, LoginManager, login_user
-from application.models import User, Post, Community, db
+from application.models import User, Posts, Community, db
 from flask_migrate import Migrate
+from .forms import Posts as PostForm
 
 app = Flask(__name__)
 
@@ -26,8 +27,19 @@ def load_user(id):
 @app.route('/') #Головна сторінка
 @app.route('/index')
 def main():
+<<<<<<< HEAD
     form = 'Це головна сторінка'
     return render_template('index.html', title='Reddit')
+=======
+    posts = Posts.query.all()
+    recomended_communities = Community.query.all()
+    form = PostForm()
+    if form.validate_on_submit():
+        post = Post(theme=form.title.data, tag=form.tag.data, author=current_user.username)
+        db.session.add(post)
+        db.session.commit()
+    return render_template('index.html', title='Reddit', post=posts, recomended_communities=recomended_communities, form=form)
+>>>>>>> 890e603 (Post)
 
 
 @app.route('/sing_in', methods=['GET', 'POST']) #Реєстрація
