@@ -45,7 +45,7 @@ class Posts(FlaskForm):  # Треба бд для додавання пості�
 
     title = TextAreaField('Заголовок', validators=[Length(min=0, max=130)])
     posts = TextAreaField('Пост', validators=[Length(min=0, max=350)])
-    tag = TextAreaField('Тег', validators=Length(min=0, max=100))
+    tag = TextAreaField('Тег', validators=[Length(min=0, max=100)])
     submit = SubmitField('Підтвердити')
 
 class Comment(FlaskForm):

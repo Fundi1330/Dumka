@@ -6,7 +6,7 @@
             {{ form.hidden_tag() }}
             {{ form.title.label }}
             {{ form.title(class_='form__input') }}
-            {% for error in form.label.errors %}
+            {% for error in form.title.errors %}
                 <p style="color: red;">[{{error}}]</p>
             {% endfor %}
             {{ form.posts.label }}

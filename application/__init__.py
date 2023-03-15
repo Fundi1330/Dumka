@@ -1,5 +1,5 @@
 from flask import Flask, render_template, flash, redirect, url_for
-from application.forms import SingUp, Login
+from application.forms import Registration, Login
 from flask_login import current_user, LoginManager, login_user
 from application.models import User, Post, Community, db
 from flask_migrate import Migrate
@@ -27,9 +27,7 @@ def load_user(id):
 @app.route('/') #Головна сторінка
 @app.route('/index')
 def main():
-    form = 'Це головна сторінка'
-    return render_template('index.html', title='Reddit')
-    posts = Posts.query.all()
+    posts = Post.query.all()
     recomended_communities = Community.query.all()
     form = PostForm()
     if form.validate_on_submit():
@@ -41,7 +39,7 @@ def main():
 
 @app.route('/sing_in', methods=['GET', 'POST']) #Реєстрація
 def sing_up():
-    form = SingUp()
+    form = Registration()
     if form.validate_on_submit():
         user = User(username=form.username.data, email=form.email.data, password_hash=form.password.data )
         user.set_password(form.password.data)
