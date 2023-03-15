@@ -27,10 +27,8 @@ def load_user(id):
 @app.route('/') #Головна сторінка
 @app.route('/index')
 def main():
-<<<<<<< HEAD
     form = 'Це головна сторінка'
     return render_template('index.html', title='Reddit')
-=======
     posts = Posts.query.all()
     recomended_communities = Community.query.all()
     form = PostForm()
@@ -39,7 +37,6 @@ def main():
         db.session.add(post)
         db.session.commit()
     return render_template('index.html', title='Reddit', post=posts, recomended_communities=recomended_communities, form=form)
->>>>>>> 890e603 (Post)
 
 
 @app.route('/sing_in', methods=['GET', 'POST']) #Реєстрація
