@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, Email
@@ -34,6 +35,9 @@ class EditFormprivat(FlaskForm):  # Теж треба бд
     password = PasswordField('Password', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
     submit = SubmitField('Submit')  # Button
+=======
+
+>>>>>>> 88ccd77 (Create forms.py)
 =======
 
 >>>>>>> 88ccd77 (Create forms.py)
