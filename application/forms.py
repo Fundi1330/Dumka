@@ -4,28 +4,6 @@ from wtforms.validators import DataRequired, Email
 from wtforms.validators import Length
 from hashlib import md5
 
-
-<<<<<<< HEAD
-class SingUp(FlaskForm):  # Для реєстрації, треба html
-    name = StringField('Name', validators=[DataRequired()])
-    username = StringField('Username', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    submit = SubmitField('Submit')
-
-
-class Login(FlaskForm):  # Для входу, треба html
-    username = StringField('Username', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    remember_me = BooleanField('Remember Me!')
-    submit = SubmitField('Submit')
-
-
-class EditForm(FlaskForm):  # Для того щоб миняти імя и тд треба бд
-    username = StringField('Username', validators=[DataRequired()])
-    about_me = TextAreaField('about_me', validators=[Length(min=0, max=140)])
-    submit = SubmitField('Submit')  # Button
-=======
 class Registration(FlaskForm):  # Для реєстрації, треба html
     name = StringField('Імя', validators=[DataRequired()])
     nickname = StringField('Користувач', validators=[DataRequired('Не мже бути пусте')])
@@ -45,19 +23,13 @@ class EditForm(FlaskForm):  # Для того щоб миняти імя и тд
     nickname = StringField('Користувач', validators=[DataRequired()])
     about_me = TextAreaField('Про мене', validators=[Length(min=0, max=140)])
     submit = SubmitField('Підтвердити')  # Кнопка
->>>>>>> 413dc29 (SubmitField)
+
 
     def avatar(self, size):
         return """Силка на фото""" + md5(self.email).hexdigest() + '?d=mm&s=' + str(size)
 
 
-<<<<<<< HEAD
-class EditFormprivat(FlaskForm):  # Теж треба бд
-    username = StringField('Username', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    submit = SubmitField('Submit')  # Button
-=======
+
 class EditFormPrivat(FlaskForm):  # Теж треба бд
     # бд
 
@@ -79,4 +51,3 @@ class Posts(FlaskForm):  # Треба бд для додавання пості�
 class Comment(FlaskForm):
     comets = TextAreaField('Коментувати', validators=[Length(min=0, max=300)])
     submit = SubmitField('Підтвердити')
->>>>>>> 413dc29 (SubmitField)
