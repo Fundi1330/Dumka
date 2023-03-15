@@ -1,4 +1,4 @@
-{% extends '../base.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
     <form action="" method="post">
@@ -9,7 +9,7 @@
             <p style="color: red;">[{{error}}]</p>
         {% endfor %}
         {{ form.password.label }}
-        {{ form.password(class_'form__input') }}
+        {{ form.password(class_='form__input') }}
         {% for error in form.password.errors %}
             <p style="color: red;">[{{error}}]</p>
         {% endfor %}
