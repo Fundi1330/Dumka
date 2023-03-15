@@ -18,7 +18,7 @@ def main():
 
 
 @app.route('/sing_in') #Реєстрація
-def sing_in():
+def sing_up():
     form = SingUp()
     if form.validate_on_submit():
         user = User(username=form.username.data, email=form.email,password_hash=form.password.data )
@@ -32,7 +32,7 @@ def sing_in():
 def log_in():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
-    form = forms.Login()
+    form = Login()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
