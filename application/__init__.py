@@ -1,4 +1,11 @@
+<<<<<<< HEAD
 from flask import Flask, render_template
+=======
+from flask import Flask, render_template, flash, redirect, url_for
+from application.forms import SingUp, Login
+from flask_login import current_user, LoginManager, login_user,
+from application.models import User, Post, Community
+>>>>>>> 1f3c7f3 (changed imports)
 
 app = Flask(__name__)
 
@@ -29,4 +36,8 @@ def user(username):
 
 @app.route('/kind/<subreddit>') #Сабреддіт
 def kind(subreddit):
+<<<<<<< HEAD
     return render_template('kind.html')
+=======
+    return render_template('kind.html', title='subreddit')
+>>>>>>> 1f3c7f3 (changed imports)
