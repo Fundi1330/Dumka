@@ -22,6 +22,11 @@ with app.app_context():
 def load_user(id):
     return User.query.get(int(id))
 
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
 
 @app.route('/') #Головна сторінка
 @app.route('/index')
