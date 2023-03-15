@@ -11,11 +11,13 @@ class SingUp(FlaskForm):  # Для реєстрації, треба html
     password = PasswordField('Password', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
     remember_me = BooleanField('Remember Me!')
+    submit = SubmitField('Submit')
 
 
 class Login(FlaskForm):  # Для входу, треба html
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
+    submit = SubmitField('Submit')
 
 
 class EditForm(FlaskForm):  # Для того щоб миняти імя и тд треба бд

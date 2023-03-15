@@ -39,7 +39,7 @@ def sing_up():
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('login'))
-    return render_template('register.html', title='Sing Up', form=form)
+    return render_template('authorization/register.html', title='Sing Up', form=form)
 
 @app.route('/log_in', methods=['GET', 'POST']) #вхід на акк
 def log_in():
@@ -53,7 +53,7 @@ def log_in():
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
         return redirect(url_for('index'))
-    return render_template('login.html', title='Log In', form=form)
+    return render_template('authorization/login.html', title='Log In', form=form)
 
 @app.route('/public') #публікація
 def public():
