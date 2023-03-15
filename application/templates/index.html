@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <section class="write__post">
+        <form action="" method="post"></form>
+    </section>
+    <section class="recomended">
+        {% for community in recomended_communities %}
+            <h2 class="recomended__item">community.name</h2>
+            <p class="recomended__item">comminity.desc</p>
+        {% endfor %}
+    </section>
+    <section class="posts">
+        {% for post in posts %}
+            <h3 class="post__header">post.header</h3>
+            <p class="post__body">post.body</p>
+        {% endfor %}
+    </section>
+{% endblock %}
