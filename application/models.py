@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -38,4 +36,3 @@ class Community(db.Model):
 
     def __repr__(self) -> str:
         return '<Community {}'.format(self.name)
->>>>>>> dfd7972 (updated models.py)
