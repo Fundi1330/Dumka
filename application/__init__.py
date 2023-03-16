@@ -1,7 +1,13 @@
 from flask import Flask, render_template, flash, redirect, url_for
+<<<<<<< HEAD
 from application.forms import Registration, Login
 from flask_login import current_user, LoginManager, login_user
 from application.models import User, Post, Community, db
+=======
+from .forms import SingUp, Login
+from flask_login import current_user, LoginManager, login_user
+from .models import User, Posts, Community, db
+>>>>>>> 50cb29a (corrected imports)
 from flask_migrate import Migrate
 from .forms import Posts as PostForm
 
