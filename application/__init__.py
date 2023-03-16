@@ -20,7 +20,7 @@ login = LoginManager(app)
 
 
 
-admin = Admin(app, "OP", url='/admin')
+admin = Admin(app, "OP", url='/admin')       #поки без паролю
 
 
 with app.app_context():
@@ -49,8 +49,8 @@ def main():
     return render_template('index.html', title='Reddit', post=posts, recomended_communities=recomended_communities, form=form)
 
 
-@app.route('/SingUp', methods=['GET', 'POST']) #Реєстрація
-def SignUp():
+@app.route('/singup', methods=['GET', 'POST']) #Реєстрація
+def signup():
     form = Registration()
     if form.validate_on_submit():
         user = Registration(username=form.nickname.data, email=form.email.data, password_hash=form.password.data )
@@ -60,8 +60,8 @@ def SignUp():
         return redirect(url_for('log_in'))
     return render_template('authorization/register.html', title='Sing Up', form=form)
 
-@app.route('/Login', methods=['GET', 'POST']) #вхід на акк
-def Login():
+@app.route('/login', methods=['GET', 'POST']) #вхід на акк
+def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     form = Registration()
