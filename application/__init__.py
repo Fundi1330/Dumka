@@ -39,7 +39,8 @@ def main():
     recomended_communities = Community.query.all()
     form = PostForm()
     if form.validate_on_submit() and current_user.is_authenticated:
-        post = Post(theme=form.title.data, tag=form.tag.data, author=current_user.username)
+        tags = '{' + str(form.tag.data) + '}'
+        post = Post(theme=form.title.data, tags=tags, author=current_user.username)
         db.session.add(post)
         db.session.commit()
     return render_template('index.html', title='Reddit', posts=posts, recomended_communities=recomended_communities, form=form)
