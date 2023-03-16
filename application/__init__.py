@@ -49,8 +49,8 @@ def main():
     return render_template('index.html', title='Reddit', post=posts, recomended_communities=recomended_communities, form=form)
 
 
-@app.route('/sing_in', methods=['GET', 'POST']) #Реєстрація
-def sing_up():
+@app.route('/SingUp', methods=['GET', 'POST']) #Реєстрація
+def SignUp():
     form = Registration()
     if form.validate_on_submit():
         user = Registration(username=form.nickname.data, email=form.email.data, password_hash=form.password.data )
@@ -60,8 +60,8 @@ def sing_up():
         return redirect(url_for('log_in'))
     return render_template('authorization/register.html', title='Sing Up', form=form)
 
-@app.route('/log_in', methods=['GET', 'POST']) #вхід на акк
-def log_in():
+@app.route('/Login', methods=['GET', 'POST']) #вхід на акк
+def Login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     form = Registration()
