@@ -6,7 +6,7 @@ from hashlib import md5
 
 
 class Registration(FlaskForm):  # Для реєстрації, треба html
-    name = StringField('Імя', validators=[DataRequired()])
+    name = StringField('Імя', validators=[DataRequired('Не мже бути пусте')])
     nickname = StringField('Користувач', validators=[DataRequired('Не мже бути пусте')])
     password = PasswordField('Пароль', validators=[DataRequired('Не мже бути пусте')])
     email = StringField('Почта', validators=[DataRequired(), Email()])
@@ -14,15 +14,15 @@ class Registration(FlaskForm):  # Для реєстрації, треба html
     submit = SubmitField('Підтвердити')
 
 class Login(FlaskForm):  # Для входу, треба html
-    nickname = StringField('Користувач', validators=[DataRequired()])
+    nickname = StringField('Користувач', validators=[DataRequired('Не мже бути пусте')])
     password = PasswordField('Пароль', validators=[DataRequired('Не мже бути пусте')])
     submit = SubmitField('Підтвердити')
 
 class EditForm(FlaskForm):  # Для того щоб миняти імя и тд треба бд
     # бд
 
-    nickname = StringField('Користувач', validators=[DataRequired()])
-    about_me = TextAreaField('Про мене', validators=[Length(min=0, max=140)])
+    name = StringField('Користувач', validators=[DataRequired('Не мже бути пусте')])
+    about_me = TextAreaField('Про мене', validators=[Length(min=0, max=500)])
     submit = SubmitField('Підтвердити')  # Кнопка
 
     def avatar(self, size):
@@ -33,20 +33,20 @@ class EditFormPrivat(FlaskForm):  # Теж треба бд
     # бд
 
 
-    nickname = StringField('Користувач', validators=[DataRequired()])
+    username = StringField('Користувач', validators=[DataRequired()])
     password = PasswordField('Пароль', validators=[DataRequired('Не мже бути пусте')])
-    email = StringField('Почта', validators=[DataRequired(), Email()])
+    email = StringField('Почта', validators=[DataRequired('Не мже бути пусте'), Email()])
     submit = SubmitField('Підтвердити')  # Кнопка
 
 
 class Posts(FlaskForm):  # Треба бд для додавання постів та коментів
     # бд
 
-    title = TextAreaField('Заголовок', validators=[Length(min=0, max=130)])
-    posts = TextAreaField('Пост', validators=[Length(min=0, max=350)])
-    tag = TextAreaField('Тег', validators=Length(min=0, max=100))
+    title = TextAreaField('Заголовок', validators=[Length(min=0, max=400), DataRequired('Не мже бути пусте')])
+    posts = TextAreaField('Пост', validators=[Length(min=0, max=1800), DataRequired('Не мже бути пусте')])
+    tag = TextAreaField('Тег', validators=Length(min=0, max=200))
     submit = SubmitField('Підтвердити')
 
 class Comment(FlaskForm):
-    comets = TextAreaField('Коментувати', validators=[Length(min=0, max=300)])
+    comets = TextAreaField('Коментувати', validators=[Length(min=0, max=800)])
     submit = SubmitField('Підтвердити')
