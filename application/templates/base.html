@@ -13,9 +13,10 @@
             <nav class="menu__wrapper">
                 <ul class="menu__list">
                     <li class="menu__item"><a href="/">Головна</a></li>
-                    {% if current_user.is_anonymus and not current_user.is_authenticated %}
+                    {% if current_user.is_anonymus %}
                     <li class="menu__item"><a href="/signup">Реєстрація</a></li>
-                    {% else %}
+                    {% endif %}
+                    {% if not current_user.is_authenticated %}
                     <li class="menu__item"><a href="/login">Вхід</a></li>
                     {% endif %}
                     {% if current_user.is_authenticated %}
