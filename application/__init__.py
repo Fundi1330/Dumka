@@ -19,8 +19,17 @@ migrate = Migrate(app, db)
 
 login = LoginManager(app)
 
+<<<<<<< HEAD
 @app.before_first_request
 def create_tables():
+=======
+
+
+admin = Admin(app, "OP", url='/admin')       #поки без паролю
+
+
+with app.app_context():
+>>>>>>> 0fcc290 (corrected name of func)
     db.create_all()
 @login.user_loader
 def load_user(id):
@@ -40,8 +49,13 @@ def main():
     return render_template('index.html', title='Reddit', posts=posts, recomended_communities=recomended_communities, form=form)
 
 
+<<<<<<< HEAD
 @app.route('/sing_in', methods=['GET', 'POST']) #Реєстрація
 def sing_up():
+=======
+@app.route('/singup', methods=['GET', 'POST']) #Реєстрація
+def signup():
+>>>>>>> 0fcc290 (corrected name of func)
     form = Registration()
     if form.validate_on_submit():
         user = User(name=form.name.data, username=form.username.data, email=form.email.data, password_hash=form.password.data)
@@ -51,8 +65,13 @@ def sing_up():
         return redirect(url_for('log_in'))
     return render_template('authorization/register.html', title='Sing Up', form=form)
 
+<<<<<<< HEAD
 @app.route('/log_in', methods=['GET', 'POST']) #вхід на акк
 def log_in():
+=======
+@app.route('/login', methods=['GET', 'POST']) #вхід на акк
+def login():
+>>>>>>> 0fcc290 (corrected name of func)
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     form = Login()
