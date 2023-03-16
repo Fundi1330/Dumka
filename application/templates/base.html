@@ -10,24 +10,6 @@
 <body>
     <div class="wrapper">
         <header class="header">
-            <nav class="menu__wrapper">
-                <ul class="menu__list">
-                    <li class="menu__item"><a href="/">Головна</a></li>
-                    {% if current_user.is_anonymus %}
-                    <li class="menu__item"><a href="/signup">Реєстрація</a></li>
-<<<<<<< HEAD
-                    {% endif %}
-                    {% if not current_user.is_authenticated %}
-                    <li class="menu__item"><a href="/login">Вхід</a></li>
-                    {% endif %}
-                    {% if current_user.is_authenticated %}
-                    <li class="menu__item"><a href="{{ url_for('user', username=current_user.username) }}">Профіль</a></li>
-                    <li class="menu__item"><a href="/logout">Вийти</a></li>
-=======
->>>>>>> ce1e375 (changed footer and header)
-                    {% endif %}
-                </ul>
-            </nav>
             <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
                 <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">
                   
