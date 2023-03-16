@@ -4,12 +4,16 @@
     <form action="" method="post">
         {{ form.hidden_tag() }}
         {{ form.username.label }}
-        {{ form.username(class_='form__input') }}
+        {{ form.username(class_='form-control') }}
         {% for error in form.username.errors %}
             <p style="color: red;">[{{error}}]</p>
         {% endfor %}
         {{ form.password.label }}
+<<<<<<< HEAD
         {{ form.password(class_='form__input') }}
+=======
+        {{ form.password(class_'form-control') }}
+>>>>>>> c157418 (added borders)
         {% for error in form.password.errors %}
             <p style="color: red;">[{{error}}]</p>
         {% endfor %}
