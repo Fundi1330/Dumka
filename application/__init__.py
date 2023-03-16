@@ -1,20 +1,26 @@
 from flask import Flask, render_template, flash, redirect, url_for
-from .forms import SingUp, Login
+from .forms import Registration, Login
 from flask_login import current_user, LoginManager, login_user
-from .models import User, Posts, Community, db
+from .models import User, Post, Community, db
 from flask_migrate import Migrate
 from .forms import Posts as PostForm
-
+from flask_admin import Admin
+from flask_admin.contrib.fileadmin import FileAdmin
+import os.path as op
 app = Flask(__name__)
-
 app.config['SECRET_KEY'] = 'StandWithUkraine'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:12345678990@localhost:5432/alya_redit'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:dima20+20@localhost:5432/alya_redit'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+path = op.join(op.dirname(__file__), 'admin')
 
 db.init_app(app)
 migrate = Migrate(app, db)
 
 login = LoginManager(app)
+
+
+
+admin = Admin(app, "OP", url='/admin')
 
 
 with app.app_context():
@@ -33,7 +39,7 @@ def logout():
 @app.route('/') #Головна сторінка
 @app.route('/index')
 def main():
-    posts = Posts.query.all()
+    posts = Post.query.all()
     recomended_communities = Community.query.all()  #рек
     form = PostForm()
     if form.validate_on_submit():
@@ -45,10 +51,10 @@ def main():
 
 @app.route('/sing_in', methods=['GET', 'POST']) #Реєстрація
 def sing_up():
-    form = SingUp()
+    form = Registration()
     if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data, password_hash=form.password.data )
-        user.set_password(form.password.data)
+        user = Registration(username=form.nickname.data, email=form.email.data, password_hash=form.password.data )
+        user.set_password(form.password.data)  #тут чогось set_password Жовтим світиться, поки розбиратися не хочу
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('log_in'))
@@ -58,9 +64,9 @@ def sing_up():
 def log_in():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
-    form = Login()
+    form = Registration()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
+        user = User.query.filter_by(username=form.nickname.data).first()
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password')
             return redirect(url_for('log_in'))
@@ -79,3 +85,5 @@ def user(username):
 @app.route('/kind/<subreddit>') #Сабреддіт
 def kind(subreddit):
     return render_template('kind.html', title='subreddit')
+
+admin.add_view(FileAdmin(path, '/admin/', name='files'))
