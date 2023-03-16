@@ -1,6 +1,6 @@
 from flask import Flask, render_template, flash, redirect, url_for
 from .forms import Registration, Login
-from flask_login import current_user, LoginManager, login_user
+from flask_login import current_user, LoginManager, login_user, logout_user
 from .models import User, Post, Community, db
 from flask_migrate import Migrate
 from .forms import Posts as PostForm
@@ -9,23 +9,20 @@ from flask_admin.contrib.fileadmin import FileAdmin
 import os.path as op
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'StandWithUkraine'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:dima20+20@localhost:5432/alya_redit'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:12345678990@localhost:5432/alya_redit'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-path = op.join(op.dirname(__file__), 'admin')
+path = op.join(op.dirname(__file__), 'static')
 
 db.init_app(app)
 migrate = Migrate(app, db)
 
 login = LoginManager(app)
 
-
-
 admin = Admin(app, "OP", url='/admin')       #поки без паролю
 
 
 with app.app_context():
     db.create_all()
-
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
@@ -33,28 +30,27 @@ def load_user(id):
 @app.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('index'))
+    return redirect('index')
 
-
-@app.route('/') #Головна сторінка
-@app.route('/index')
+@app.route('/', methods=['GET', 'POST']) #Головна сторінка
+@app.route('/index/', methods=['GET', 'POST'])
 def main():
     posts = Post.query.all()
-    recomended_communities = Community.query.all()  #рек
+    recomended_communities = Community.query.all()
     form = PostForm()
-    if form.validate_on_submit():
+    if form.validate_on_submit() and current_user.is_authenticated:
         post = Post(theme=form.title.data, tag=form.tag.data, author=current_user.username)
         db.session.add(post)
         db.session.commit()
-    return render_template('index.html', title='Reddit', post=posts, recomended_communities=recomended_communities, form=form)
+    return render_template('index.html', title='Reddit', posts=posts, recomended_communities=recomended_communities, form=form)
 
 
 @app.route('/singup', methods=['GET', 'POST']) #Реєстрація
 def signup():
     form = Registration()
     if form.validate_on_submit():
-        user = Registration(username=form.nickname.data, email=form.email.data, password_hash=form.password.data )
-        user.set_password(form.password.data)  #тут чогось set_password Жовтим світиться, поки розбиратися не хочу
+        user = User(name=form.name.data, username=form.username.data, email=form.email.data, password_hash=form.password.data)
+        user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('log_in'))
@@ -63,27 +59,36 @@ def signup():
 @app.route('/login', methods=['GET', 'POST']) #вхід на акк
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    form = Registration()
+       return redirect('index')
+    form = Login()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.nickname.data).first()
+        user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
-            flash('Invalid username or password')
-            return redirect(url_for('log_in'))
+            flash("Incorrect login data: check password or username")
+            return redirect(url_for("login"))
         login_user(user, remember=form.remember_me.data)
-        return redirect(url_for('index'))
+        return redirect('index')
     return render_template('authorization/login.html', title='Log In', form=form)
 
-@app.route('/public',methods=['GET', 'POST'] ) #публікація
+@app.route('/public') #публікація
 def public():
     return render_template('public.html', title='Public your reddit')
 
 @app.route('/user/<username>') #декоратор для перегляду профілю
 def user(username):
-    return render_template('user.html', title=username)
+    return render_template('users/profile.html', title=username)
 
 @app.route('/kind/<subreddit>') #Сабреддіт
 def kind(subreddit):
     return render_template('kind.html', title='subreddit')
 
-admin.add_view(FileAdmin(path, '/admin/', name='files'))
+@app.route('/faq')
+def faq():                # Часто задаючі питання
+    return render_template('faq.html', title='Faq')
+
+
+@app.route('/aboutus')
+def about_us():         #Про нас
+    return render_template('about_us.html', title='About us')
+
+admin.add_view(FileAdmin(path, '/static/', name='files'))
