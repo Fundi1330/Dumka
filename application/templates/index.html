@@ -1,25 +1,25 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <section class="write__post">
+    <section class="write__post border border-success">
         <form action="" method="post">
             {{ form.hidden_tag() }}
             {{ form.title.label }}
-            {{ form.title(class_='form__input') }}
+            {{ form.title(class_='form-control') }}
             {% for error in form.label.errors %}
                 <p style="color: red;">[{{error}}]</p>
             {% endfor %}
             {{ form.posts.label }}
-            {{ form.posts(class_='form__input') }}
+            {{ form.posts(class_='form-control') }}
             {% for error in form.posts.errors %}
                 <p style="color: red;">[{{error}}]</p>
             {% endfor %}
             {{ form.tag.label }}
-            {{ form.tag(class_='form__input') }}
+            {{ form.tag(class_='form-control') }}
             {% for error in form.tag.errors %}
                 <p style="color: red;">[{{error}}]</p>
             {% endfor %}
-            {{ form.submit(class_='form__submit')}}
+            {{ form.submit(class_='btn btn-primary')}}
         </form>
     </section>
     <section class="recomended">

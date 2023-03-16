@@ -3,17 +3,17 @@
 <form action="" method="post">
     {{ form.hidden_tag() }}
     {{ form.username.label }}
-    {{ form.username(class_='form__input') }}
+    {{ form.username(class_='form-control') }}
     {% for error in form.username.errors %}
         <p style="color: red;">[{{error}}]</p>
     {% endfor %}
     {{ form.password.label }}
-    {{ form.password(class_='form__input') }}
+    {{ form.password(class_='form-control') }}
     {% for error in form.password.errors %}
         <p style="color: red;">[{{error}}]</p>
     {% endfor %}
     {{ form.email.label }}
-    {{ form.email(class_='form__input') }}
+    {{ form.email(class_='form-control') }}
     {% for error in form.email.errors %}
         <p style="color: red;">[{{error}}]</p>
     {% endfor %}

@@ -3,12 +3,12 @@
 <form action="" method="post">
     {{ form.hidden_tag() }}
     {{ form.name.label }}
-    {{ form.name(class_='form__input') }}
+    {{ form.name(class_='form-control') }}
     {% for error in form.name.errors %}
         <p style="color: red;">[{{error}}]</p>
     {% endfor %}
     {{ form.about_me.label }}
-    {{ form.about_me(class_='form__input') }}
+    {{ form.about_me(class_='form-control') }}
     {% for error in form.about_me.errors %}
         <p style="color: red;">[{{error}}]</p>
     {% endfor %}
