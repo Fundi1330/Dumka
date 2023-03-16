@@ -48,11 +48,4 @@ h1, h2, h3, h4, h5, h6{font-size:inherit;font-weight: 400;}
 }
 .dropdown-menu {
     min-width: 5.625rem !important;
-<<<<<<< HEAD
-=======
-}
-.write__post {
-	height: 7.5rem;
-	
->>>>>>> c157418 (added borders)
 }
