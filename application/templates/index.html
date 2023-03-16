@@ -5,13 +5,10 @@
         <form action="" method="post">
             {{ form.hidden_tag() }}
             {{ form.title.label }}
-<<<<<<< HEAD
             {{ form.title(class_='form__input') }}
             {% for error in form.title.errors %}
-=======
             {{ form.title(class_='form-control') }}
             {% for error in form.label.errors %}
->>>>>>> c157418 (added borders)
                 <p style="color: red;">[{{error}}]</p>
             {% endfor %}
             {{ form.posts.label }}
