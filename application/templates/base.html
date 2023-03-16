@@ -14,12 +14,12 @@
                 <ul class="menu__list">
                     <li class="menu__item"><a href="/">Головна</a></li>
                     {% if current_user.is_anonymus and not current_user.is_authenticated %}
-                    <li class="menu__item"><a href="/register">Реєстрація</a></li>
+                    <li class="menu__item"><a href="/signup">Реєстрація</a></li>
                     {% else %}
                     <li class="menu__item"><a href="/login">Вхід</a></li>
                     {% endif %}
                     {% if current_user.is_authenticated %}
-                    <li class="menu__item"><a href="{{ url_for() }}">Профіль</a></li>
+                    <li class="menu__item"><a href="{{ url_for('user', username=current_user.username) }}">Профіль</a></li>
                     <li class="menu__item"><a href="/logout">Вийти</a></li>
                     {% endif %}
                 </ul>
