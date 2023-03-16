@@ -33,7 +33,7 @@ def logout():
 @app.route('/index')
 def main():
     posts = Posts.query.all()
-    recomended_communities = Community.query.all()
+    recomended_communities = Community.query.all()  #рек
     form = PostForm()
     if form.validate_on_submit():
         post = Post(theme=form.title.data, tag=form.tag.data, author=current_user.username)
