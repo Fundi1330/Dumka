@@ -89,6 +89,13 @@ def kind(subreddit):
 def post(post):
     return render_template('post.html', title='Post')
 
+@app.route('/faq')
+def faq():
+    return render_template('footer/faq.html', title='Faq')
+
+@app.route('/aboutus')
+def about_us():
+    return render_template('footer/about_us.html', title="About us")
 
 
 
