@@ -1,10 +1,11 @@
 from flask import Flask, render_template, flash, redirect, url_for
-from application.forms import Registration, Login
+from .forms import Registration, Login
 from flask_login import current_user, LoginManager, login_user, logout_user
-from application.models import User, Post, Community, db
+from .models import User, Post, Community, db
 from flask_migrate import Migrate
-from application.forms import Posts as PostForm
+from .forms import Posts as PostForm
 from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
 from flask_admin.contrib.fileadmin import FileAdmin
 import os.path as op
 app = Flask(__name__)
@@ -83,4 +84,9 @@ def user(username):
 def kind(subreddit):
     return render_template('kind.html', title='subreddit')
 
+@app.route('/post/<post>')
+def post(post):
+    return render_template('post.html', title='Post')
+
 admin.add_view(FileAdmin(path, '/static/', name='files'))
+admin.add_view(ModelView(User, db.session, name='Користувачі'))
