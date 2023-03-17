@@ -84,5 +84,14 @@ def user(username):
 def kind(subreddit):
     return render_template('kind.html', title='subreddit')
 
+
+@app.route('/post/<post>')
+def post(post):
+    return render_template('post.html', title='Post')
+
+
+
+
+
 admin.add_view(FileAdmin(path, '/static/', name='files'))
 admin.add_view(ModelView(User, db.session, name='Користувачі'))
