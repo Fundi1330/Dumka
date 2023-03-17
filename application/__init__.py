@@ -41,7 +41,7 @@ def main():
     form = PostForm()
     if form.validate_on_submit() and current_user.is_authenticated:
         tags = '{' + str(form.tag.data) + '}'
-        post = Post(theme=form.title.data, tags=tags, author=current_user.username)
+        post = Post(theme=form.title.data, tags=tags, author=current_user.username, text=form.posts.data, likes=0)
         db.session.add(post)
         db.session.commit()
     return render_template('index.html', title='Reddit', posts=posts, recomended_communities=recomended_communities, form=form)
