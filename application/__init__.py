@@ -5,11 +5,12 @@ from .models import User, Post, Community, db
 from flask_migrate import Migrate
 from .forms import Posts as PostForm
 from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
 from flask_admin.contrib.fileadmin import FileAdmin
 import os.path as op
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'StandWithUkraine'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:12345678990@localhost:5432/alya_redit'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:dima20+20@localhost:5432/alya_redit'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 path = op.join(op.dirname(__file__), 'static')
 
@@ -39,7 +40,8 @@ def main():
     recomended_communities = Community.query.all()
     form = PostForm()
     if form.validate_on_submit() and current_user.is_authenticated:
-        post = Post(theme=form.title.data, tag=form.tag.data, author=current_user.username)
+        tags = '{' + str(form.tag.data) + '}'
+        post = Post(theme=form.title.data, tags=tags, author=current_user.username)
         db.session.add(post)
         db.session.commit()
     return render_template('index.html', title='Reddit', posts=posts, recomended_communities=recomended_communities, form=form)
@@ -82,13 +84,5 @@ def user(username):
 def kind(subreddit):
     return render_template('kind.html', title='subreddit')
 
-@app.route('/faq')
-def faq():                # Часто задаючі питання
-    return render_template('faq.html', title='Faq')
-
-
-@app.route('/aboutus')
-def about_us():         #Про нас
-    return render_template('about_us.html', title='About us')
-
 admin.add_view(FileAdmin(path, '/static/', name='files'))
+admin.add_view(ModelView(User, db.session, name='Користувачі'))
