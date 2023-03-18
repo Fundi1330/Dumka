@@ -2,6 +2,7 @@ venv/
 .venv/
 .idea/
 .vscode/
+<<<<<<< HEAD
 .py[cod]
 
 # C extensions
@@ -50,3 +51,7 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
+=======
+__pycache__/
+*.pyc
+>>>>>>> 82163c1 (updated inde and created faq and about us)
