@@ -8,6 +8,8 @@ from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.contrib.fileadmin import FileAdmin
 import os.path as op
+import datetime
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'StandWithUkraine'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:12345678990@localhost:5432/alya_redit'
@@ -36,14 +38,15 @@ def logout():
 @app.route('/', methods=['GET', 'POST']) #Головна сторінка
 @app.route('/index/', methods=['GET', 'POST'])
 def main():
-    posts = Post.query.all()
+    posts = Post.query.order_by(Post.date_of_publication).all()
     recomended_communities = Community.query.all()
     form = PostForm()
     if form.validate_on_submit() and current_user.is_authenticated:
         tags = '{' + str(form.tag.data) + '}'
-        post = Post(theme=form.title.data, tags=tags, author=current_user.username, text=form.posts.data, likes=0)
+        post = Post(theme=form.title.data, tags=tags, author=current_user.username, text=form.posts.data, likes=0, date_of_publication=datetime.datetime.now())
         db.session.add(post)
         db.session.commit()
+        flash('Пост успішно доданий на сайт!')
     return render_template('index.html', title='Reddit', posts=posts, recomended_communities=recomended_communities, form=form)
 
 

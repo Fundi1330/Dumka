@@ -27,9 +27,9 @@ class User(db.Model, UserMixin):
 class Post(db.Model):
     __tablename__ = 'Post'
     id = db.Column(db.Integer, primary_key=True)
-    theme = db.Column(db.String)
-    text = db.Column(db.String(140))
-    date_of_publication = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    theme = db.Column(db.String, index=True)
+    text = db.Column(db.String, index=True)
+    date_of_publication = db.Column(db.DateTime, index=True)
     tags = db.Column(ARRAY(db.String))
     author = db.Column(db.String, index=True)
     likes = db.Column(db.Integer, index=True)
