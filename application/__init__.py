@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flash, redirect, url_for
+from flask import Flask, render_template, flash, redirect, url_for, request
 from .forms import Registration, Login
 from flask_login import current_user, LoginManager, login_user, logout_user
 from .models import User, Post, Community, db
@@ -47,6 +47,7 @@ def main():
         db.session.add(post)
         db.session.commit()
         flash('Пост успішно доданий на сайт!')
+
     return render_template('index.html', title='Reddit', posts=posts, recomended_communities=recomended_communities, form=form)
 
 
@@ -59,6 +60,7 @@ def signup():
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('log_in'))
+
     return render_template('authorization/register.html', title='Sing Up', form=form)
 
 @app.route('/login', methods=['GET', 'POST']) #вхід на акк
@@ -87,9 +89,23 @@ def user(username):
 def kind(subreddit):
     return render_template('kind.html', title='subreddit')
 
-@app.route('/post/<post>')
-def post(post):
+@app.route('/editpost')
+def edit_post():
+    return render_template('edit_post', title='Edit your post')
+
+@app.route('/post/<int:id>')
+def post(id):
+    post = Post.query.filter_by(id=id).first()
+
+    if 'delete' in request.form:
+        db.session.delete(post)
+        db.session.commit()
+        return redirect('/')
+    elif 'edit' in request.form:
+        return redirect('/editpost')
+
     return render_template('post.html', title='Post')
+
 
 admin.add_view(FileAdmin(path, '/static/', name='files'))
 admin.add_view(ModelView(User, db.session, name='Користувачі'))
