@@ -10,13 +10,14 @@ class Registration(FlaskForm):  # Для реєстрації, треба html
     nickname = StringField('Користувач', validators=[DataRequired('Не може бути пусте')])
     password = PasswordField('Пароль', validators=[DataRequired('Не може бути пусте')])
     email = StringField('Почта', validators=[DataRequired('Не може бути пусте'), Email()])
-    remember_me = BooleanField('Запамятай мене!')
+
     submit = SubmitField('Підтвердити')
 
 class Login(FlaskForm):  # Для входу, треба html
     nickname = StringField('Користувач', validators=[DataRequired('Не може бути пусте')])
     password = PasswordField('Пароль', validators=[DataRequired('Не може бути пусте')])
     submit = SubmitField('Підтвердити')
+    remember_me = BooleanField('Запамятай мене!')
 
 class EditForm(FlaskForm):  # Для того щоб миняти імя и тд треба бд
     # бд
