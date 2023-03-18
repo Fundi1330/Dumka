@@ -36,7 +36,7 @@ def logout():
 @app.route('/', methods=['GET', 'POST']) #Головна сторінка
 @app.route('/index/', methods=['GET', 'POST'])
 def main():
-    posts = Post.query.all()
+    posts = Post.query.order_by(date_of_publication).all()
     recomended_communities = Community.query.all()
     form = PostForm()
     if form.validate_on_submit() and current_user.is_authenticated:
