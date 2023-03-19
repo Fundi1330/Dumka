@@ -48,6 +48,8 @@ def main():
         db.session.commit()
         flash('Пост успішно доданий на сайт!')
 
+
+
     return render_template('index.html', title='Reddit', posts=posts, recomended_communities=recomended_communities, form=form)
 
 
@@ -110,3 +112,7 @@ def post(id):
 
 admin.add_view(FileAdmin(path, '/static/', name='files'))
 admin.add_view(ModelView(User, db.session, name='Користувачі'))
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
