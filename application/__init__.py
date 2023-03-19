@@ -89,8 +89,9 @@ def user(username):
 def kind(subreddit):
     return render_template('kind.html', title='subreddit')
 
-@app.route('/editpost')
-def edit_post():
+@app.route('/editpost/<int:id>')
+def edit_post(id):
+    post = Post.query.filter_by(id=id).first()
     return render_template('edit_post', title='Edit your post')
 
 @app.route('/post/<int:id>')
