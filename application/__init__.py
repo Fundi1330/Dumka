@@ -9,6 +9,7 @@ from flask_admin.contrib.sqla import ModelView
 from flask_admin.contrib.fileadmin import FileAdmin
 import os.path as op
 import datetime
+from re import findall
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'StandWithUkraine'
@@ -42,11 +43,21 @@ def main():
     recomended_communities = Community.query.all()
     form = PostForm()
     if form.validate_on_submit() and current_user.is_authenticated:
-        tags = '{' + str(form.tag.data) + '}'
+        # tag_list = form.tag.data.split(', ')
+        # flash(tag_list)
+        # tags = ' '.join(tag_list)
+        # flash(tags)
+        # changed_tags = tags.replace('[', '{').replace(']', '}').replace('\'', '\"').replace('\" \"', '')
+        # flash(changed_tags)
+        tags = findall('[a-z]{1,}', form.tag.data.lower())
+        flash(tags)
+
         post = Post(theme=form.title.data, tags=tags, author=current_user.username, text=form.posts.data, likes=0, date_of_publication=datetime.datetime.now())
         db.session.add(post)
         db.session.commit()
         flash('Пост успішно доданий на сайт!')
+    elif not current_user.is_authenticated:
+        flash('Спочатку вам потрібно зареєструватися!')
     return render_template('index.html', title='Reddit', posts=posts, recomended_communities=recomended_communities, form=form)
 
 
@@ -58,7 +69,7 @@ def signup():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        return redirect(url_for('log_in'))
+        return redirect(url_for('login'))
     return render_template('authorization/register.html', title='Sing Up', form=form)
 
 @app.route('/login', methods=['GET', 'POST']) #вхід на акк
@@ -69,7 +80,7 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
-            flash("Incorrect login data: check password or username")
+            flash("Неправильний логін або пароль")
             return redirect(url_for("login"))
         login_user(user, remember=form.remember_me.data)
         return redirect('index')
@@ -102,7 +113,7 @@ def post(id):
     elif 'edit' in request.form:
         return redirect('/editpost')
 
-    return render_template('post.html', title='Post')
+    return render_template('posts/post.html', title='Post')
 
 
 admin.add_view(FileAdmin(path, '/static/', name='files'))

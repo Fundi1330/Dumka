@@ -33,7 +33,7 @@
     <section class="posts">
         <h2>Пости:</h2>
         {% for post in posts %}
-        <a href="{{ url_for('post', post=post.id)}}">
+        <a href="{{ url_for('post', id=post.id)}}">
             <div class="border border-info rounded p-3 my-3">
                 <h6>Автор: {{ post.author }}</h6>
                 <h3 class="post__header">{{ post.theme }}</h3>
@@ -52,12 +52,7 @@
                 
             </div>
         </a>
-            <!-- {% if current_user.username == post.author %}
-                    <form action="" method="post">
-                        <input type="submit" class="delete" name="delete"></input>
-                        <input type="submit" class="edit" name="edit"></input>
-                    </form>
-            {% endif %} -->
+            
         {% endfor %}
     </section>
 {% endblock %}

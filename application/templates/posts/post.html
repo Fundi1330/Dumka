@@ -1,3 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
+
+    {% if current_user.username == post.author %}
+        <form action="" method="post">
+            <input type="submit" class="delete" name="delete"></input>
+            <input type="submit" class="edit" name="edit"></input>
+        </form>
+    {% endif %}
 {% endblock %}
