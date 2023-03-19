@@ -7,13 +7,13 @@ from hashlib import md5
 
 class Registration(FlaskForm):  # Для реєстрації, треба html
     name = StringField('Імя', validators=[DataRequired('Не може бути пусте')])
-    nickname = StringField('Користувач', validators=[DataRequired('Не може бути пусте')])
+    username = StringField('Користувач', validators=[DataRequired('Не може бути пусте')])
     password = PasswordField('Пароль', validators=[DataRequired('Не може бути пусте')])
     email = StringField('Почта', validators=[DataRequired('Не може бути пусте'), Email()])
     submit = SubmitField('Підтвердити')
 
 class Login(FlaskForm):  # Для входу, треба html
-    nickname = StringField('Користувач', validators=[DataRequired('Не може бути пусте')])
+    username = StringField('Користувач', validators=[DataRequired('Не може бути пусте')])
     password = PasswordField('Пароль', validators=[DataRequired('Не може бути пусте')])
     submit = SubmitField('Підтвердити')
     remember_me = BooleanField('Запамятай мене!')
