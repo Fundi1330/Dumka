@@ -43,14 +43,7 @@ def main():
     recomended_communities = Community.query.all()
     form = PostForm()
     if form.validate_on_submit() and current_user.is_authenticated:
-        # tag_list = form.tag.data.split(', ')
-        # flash(tag_list)
-        # tags = ' '.join(tag_list)
-        # flash(tags)
-        # changed_tags = tags.replace('[', '{').replace(']', '}').replace('\'', '\"').replace('\" \"', '')
-        # flash(changed_tags)
-        tags = findall('[a-z]{1,}', form.tag.data.lower())
-        flash(tags)
+        tags = findall('[a-z]{1,}|[a-z]{1,}\s[a-z]{1,}', form.tag.data.lower())
 
         post = Post(theme=form.title.data, tags=tags, author=current_user.username, text=form.posts.data, likes=0, date_of_publication=datetime.datetime.now())
         db.session.add(post)
@@ -102,7 +95,7 @@ def kind(subreddit):
 def edit_post():
     return render_template('edit_post', title='Edit your post')
 
-@app.route('/post/<int:id>')
+@app.route('/post/<int:id>', methods=['GET', 'POST'])
 def post(id):
     post = Post.query.filter_by(id=id).first()
 
@@ -113,7 +106,7 @@ def post(id):
     elif 'edit' in request.form:
         return redirect('/editpost')
 
-    return render_template('posts/post.html', title='Post')
+    return render_template('posts/post.html', title='Post', post=post)
 
 
 admin.add_view(FileAdmin(path, '/static/', name='files'))

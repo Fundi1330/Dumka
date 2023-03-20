@@ -1,10 +1,29 @@
 {% extends 'base.html' %}
 {% block content %}
-
+    <section class="post">
+        <div class="border rounded p-3 my-3">
+            <section class="likes d-flex h-100 bg-info m-0">
+                <p>{{ post.likes }}</p>
+            </section>
+            <h6>Автор: {{ post.author }}</h6>
+            <h3 class="post__header">{{ post.theme }}</h3>
+            <p class="post__body">
+                {{ post.text }}
+            </p>
+            <div class="tags">
+                <ul class="p-0 d-inline">
+                    <h5 class="tags__title my-3 p-0">Теги:</h5>
+                    {% for tag in post.tags %}
+                        <p class="tag border border-danger rounded p-1 my-3 d-inline">{{ tag }}</p>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </section>
     {% if current_user.username == post.author %}
         <form action="" method="post">
-            <input type="submit" class="delete" name="delete"></input>
-            <input type="submit" class="edit" name="edit"></input>
+            <input type="image" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHg9IjBweCIgeT0iMHB4Igp3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIKdmlld0JveD0iMCAwIDUwIDUwIj4KPHBhdGggZD0iTSAyMSAyIEMgMTkuMzU0NTQ1IDIgMTggMy4zNTQ1NDU1IDE4IDUgTCAxOCA3IEwgMTAuMTU0Mjk3IDcgQSAxLjAwMDEgMS4wMDAxIDAgMCAwIDkuOTg0Mzc1IDYuOTg2MzI4MSBBIDEuMDAwMSAxLjAwMDEgMCAwIDAgOS44Mzk4NDM4IDcgTCA4IDcgQSAxLjAwMDEgMS4wMDAxIDAgMSAwIDggOSBMIDkgOSBMIDkgNDUgQyA5IDQ2LjY0NTQ1NSAxMC4zNTQ1NDUgNDggMTIgNDggTCAzOCA0OCBDIDM5LjY0NTQ1NSA0OCA0MSA0Ni42NDU0NTUgNDEgNDUgTCA0MSA5IEwgNDIgOSBBIDEuMDAwMSAxLjAwMDEgMCAxIDAgNDIgNyBMIDQwLjE2Nzk2OSA3IEEgMS4wMDAxIDEuMDAwMSAwIDAgMCAzOS44NDE3OTcgNyBMIDMyIDcgTCAzMiA1IEMgMzIgMy4zNTQ1NDU1IDMwLjY0NTQ1NSAyIDI5IDIgTCAyMSAyIHogTSAyMSA0IEwgMjkgNCBDIDI5LjU1NDU0NSA0IDMwIDQuNDQ1NDU0NSAzMCA1IEwgMzAgNyBMIDIwIDcgTCAyMCA1IEMgMjAgNC40NDU0NTQ1IDIwLjQ0NTQ1NSA0IDIxIDQgeiBNIDExIDkgTCAxOC44MzIwMzEgOSBBIDEuMDAwMSAxLjAwMDEgMCAwIDAgMTkuMTU4MjAzIDkgTCAzMC44MzIwMzEgOSBBIDEuMDAwMSAxLjAwMDEgMCAwIDAgMzEuMTU4MjAzIDkgTCAzOSA5IEwgMzkgNDUgQyAzOSA0NS41NTQ1NDUgMzguNTU0NTQ1IDQ2IDM4IDQ2IEwgMTIgNDYgQyAxMS40NDU0NTUgNDYgMTEgNDUuNTU0NTQ1IDExIDQ1IEwgMTEgOSB6IE0gMTguOTg0Mzc1IDEzLjk4NjMyOCBBIDEuMDAwMSAxLjAwMDEgMCAwIDAgMTggMTUgTCAxOCA0MCBBIDEuMDAwMSAxLjAwMDEgMCAxIDAgMjAgNDAgTCAyMCAxNSBBIDEuMDAwMSAxLjAwMDEgMCAwIDAgMTguOTg0Mzc1IDEzLjk4NjMyOCB6IE0gMjQuOTg0Mzc1IDEzLjk4NjMyOCBBIDEuMDAwMSAxLjAwMDEgMCAwIDAgMjQgMTUgTCAyNCA0MCBBIDEuMDAwMSAxLjAwMDEgMCAxIDAgMjYgNDAgTCAyNiAxNSBBIDEuMDAwMSAxLjAwMDEgMCAwIDAgMjQuOTg0Mzc1IDEzLjk4NjMyOCB6IE0gMzAuOTg0Mzc1IDEzLjk4NjMyOCBBIDEuMDAwMSAxLjAwMDEgMCAwIDAgMzAgMTUgTCAzMCA0MCBBIDEuMDAwMSAxLjAwMDEgMCAxIDAgMzIgNDAgTCAzMiAxNSBBIDEuMDAwMSAxLjAwMDEgMCAwIDAgMzAuOTg0Mzc1IDEzLjk4NjMyOCB6Ij48L3BhdGg+Cjwvc3ZnPg==" width="25" class="d-inline" name="delete" />
+            <input type="image" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHg9IjBweCIgeT0iMHB4Igp3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIKdmlld0JveD0iMCAwIDI0IDI0Ij4KICAgIDxwYXRoIGQ9Ik0gMTguNDE0MDYyIDIgQyAxOC4xNTgwNjIgMiAxNy45MDIwMzEgMi4wOTc5Njg3IDE3LjcwNzAzMSAyLjI5Mjk2ODggTCAxNS43MDcwMzEgNC4yOTI5Njg4IEwgMTQuMjkyOTY5IDUuNzA3MDMxMiBMIDMgMTcgTCAzIDIxIEwgNyAyMSBMIDIxLjcwNzAzMSA2LjI5Mjk2ODggQyAyMi4wOTgwMzEgNS45MDE5Njg3IDIyLjA5ODAzMSA1LjI2ODkwNjMgMjEuNzA3MDMxIDQuODc4OTA2MiBMIDE5LjEyMTA5NCAyLjI5Mjk2ODggQyAxOC45MjYwOTQgMi4wOTc5Njg3IDE4LjY3MDA2MyAyIDE4LjQxNDA2MiAyIHogTSAxOC40MTQwNjIgNC40MTQwNjI1IEwgMTkuNTg1OTM4IDUuNTg1OTM3NSBMIDE4LjI5Mjk2OSA2Ljg3ODkwNjIgTCAxNy4xMjEwOTQgNS43MDcwMzEyIEwgMTguNDE0MDYyIDQuNDE0MDYyNSB6IE0gMTUuNzA3MDMxIDcuMTIxMDkzOCBMIDE2Ljg3ODkwNiA4LjI5Mjk2ODggTCA2LjE3MTg3NSAxOSBMIDUgMTkgTCA1IDE3LjgyODEyNSBMIDE1LjcwNzAzMSA3LjEyMTA5MzggeiI+PC9wYXRoPgo8L3N2Zz4=" width="25" class="d-inline" name="edit" value="edit" />
         </form>
     {% endif %}
 {% endblock %}

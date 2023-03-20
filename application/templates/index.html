@@ -33,19 +33,21 @@
     <section class="posts">
         <h2>Пости:</h2>
         {% for post in posts %}
-        <a href="{{ url_for('post', id=post.id)}}">
-            <div class="border border-info rounded p-3 my-3">
+        <a href="{{ url_for('post', id=post.id)}}" class="border-info text-decoration-none text-black">
+            <div class="border rounded p-3 my-3">
+                <section class="likes d-flex h-100 bg-info m-0">
+                    <p>{{ post.likes }}</p>
+                </section>
                 <h6>Автор: {{ post.author }}</h6>
                 <h3 class="post__header">{{ post.theme }}</h3>
-                <p>{{ post.likes }}</p>
                 <p class="post__body">
                     {{ post.text }}
                 </p>
                 <div class="tags">
                     <ul class="p-0 d-inline">
-                        <h5 class="tags__title m-0 p-0">Теги:</h5>
+                        <h5 class="tags__title my-3 p-0">Теги:</h5>
                         {% for tag in post.tags %}
-                            <p class="tag border border-danger rounded p-1 my-3">{{ tag }}</p>
+                            <p class="tag border border-danger rounded p-1 my-3 d-inline">{{ tag }}</p>
                         {% endfor %}
                     </ul>
                 </div>
