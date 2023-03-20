@@ -42,7 +42,7 @@ class EditFormPrivat(FlaskForm):  # Теж треба бд
 class Posts(FlaskForm):  # Треба бд для додавання постів та коментів
     # бд
     title = TextAreaField('Заголовок', validators=[Length(min=0, max=400), DataRequired('Не може бути пусте')])
-    posts = TextAreaField('Пост', validators=[Length(min=0, max=1800), DataRequired('Не може бути пусте')])
+    posts = TextAreaField('Пост', validators=[Length(min=0, max=3000), DataRequired('Не може бути пусте')])
     tag = TextAreaField('Тег', validators=[Length(min=0, max=200), DataRequired('Не може бути пусте')])
     submit = SubmitField('Підтвердити')
 

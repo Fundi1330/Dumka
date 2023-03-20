@@ -32,17 +32,30 @@
             {% endif %}
     </header>
     <div class="container">
-        <div class="flashes bd-callout bd-callout-danger">
-            {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                    <ul class="flash">
+        {% with messages = get_flashed_messages(category_filter=["error"]) %}
+            {% if messages %}
+            <div class="flashes-red">
+                <ul class="flash">
                     {% for message in messages %}
+                        <li><h3>Помилка!</h3></li>
                         <li>{{ message }}</li>
                     {% endfor %}
-                    </ul>
-                {% endif %}
-                {% endwith %}
-        </div>
+                </ul>
+            </div>
+            {% endif %}
+        {% endwith %}
+        {% with messages = get_flashed_messages(category_filter=["succes"]) %}
+            {% if messages %}
+            <div class="flashes-green">
+                <ul class="flash">
+                    {% for message in messages %}
+                        <li><h3>Успіх!</h3></li>
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        {% endwith %}
         <main class="main">
             {% block content %}
             

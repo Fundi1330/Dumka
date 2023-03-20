@@ -1,4 +1,28 @@
 {% extends 'base.html' %}
 {% block content %}
-
+<p>
+    <a class="btn btn-primary" data-bs-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Хто ми?</a>
+  </p>
+  <div class="row pb-3">
+    <div class="col">
+      <div class="collapse multi-collapse" id="multiCollapseExample1">
+        <div class="card card-body">
+            Ми - Студенти школи GoIteens. Цей сайт був створений, як проект.
+        </div>
+      </div>
+    </div>
+  </div>
+  <p>
+    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapseExample2" aria-expanded="false" aria-controls="multiCollapseExample2">Що це за сайт?</button>
+  </p>
+  <div class="row pb-3">
+    <div class="col">
+        <div class="collapse multi-collapse" id="multiCollapseExample2">
+          <div class="card card-body">
+              Цей сайт є українським аналогом соц. мережі Reddit. З часом сайт буде розвиватися.
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
 {% endblock %}

@@ -91,9 +91,12 @@ def user(username):
 def kind(subreddit):
     return render_template('kind.html', title='subreddit')
 
-@app.route('/editpost')
-def edit_post():
-    return render_template('edit_post', title='Edit your post')
+@app.route('/editpost/<int:id>')
+def edit_post(id):
+    post = Post.query.filter_by(id=id).first()
+    form = PostForm()
+    
+    return render_template('edit_post', title='Edit your post', form=form)
 
 @app.route('/post/<int:id>', methods=['GET', 'POST'])
 def post(id):
@@ -108,6 +111,13 @@ def post(id):
 
     return render_template('posts/post.html', title='Post', post=post)
 
+@app.route('/faq')
+def faq():
+    return render_template('footer/faq.html', title='Faq')
+
+@app.route('/about_us')
+def about_us():
+    return render_template('footer/about_us.html', title="About us")
 
 admin.add_view(FileAdmin(path, '/static/', name='files'))
 admin.add_view(ModelView(User, db.session, name='Користувачі'))
