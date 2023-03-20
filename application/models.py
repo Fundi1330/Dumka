@@ -17,7 +17,7 @@ class User(db.Model, UserMixin):
     about_me = db.Column(db.String, index=True)
     interests = db.Column(ARRAY(db.String))
     post_id = db.Column(db.Integer, primary_key=True)
-    avatar = db.Column(db.Model)
+    avatar = db.Column(db.String)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
