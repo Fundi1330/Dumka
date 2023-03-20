@@ -63,7 +63,7 @@ def signup():
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('login'))
-    return render_template('authorization/register.html', title='Sing Up', form=form)
+    return render_template('authorization/register.html', title='Реєстрація', form=form)
 
 @app.route('/login', methods=['GET', 'POST']) #вхід на акк
 def login():
@@ -73,15 +73,15 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
-            flash("Неправильний логін або пароль")
+            flash("Неправильний логін або пароль", category='error')
             return redirect(url_for("login"))
         login_user(user, remember=form.remember_me.data)
         return redirect('index')
-    return render_template('authorization/login.html', title='Log In', form=form)
+    return render_template('authorization/login.html', title='Вхід', form=form)
 
 @app.route('/public') #публікація
 def public():
-    return render_template('public.html', title='Public your reddit')
+    return render_template('public.html', title='Публікуй свій реддіт')
 
 @app.route('/user/<username>') #декоратор для перегляду профілю
 def user(username):
@@ -89,14 +89,11 @@ def user(username):
 
 @app.route('/kind/<subreddit>') #Сабреддіт
 def kind(subreddit):
-    return render_template('kind.html', title='subreddit')
+    return render_template('kind.html', title='Сабреддіт')
 
-@app.route('/editpost/<int:id>')
-def edit_post(id):
-    post = Post.query.filter_by(id=id).first()
-    form = PostForm()
-    
-    return render_template('edit_post', title='Edit your post', form=form)
+@app.route('/editpost')
+def edit_post():
+    return render_template('edit_post.html', title='Зміни свій пост')
 
 @app.route('/post/<int:id>', methods=['GET', 'POST'])
 def post(id):
@@ -107,9 +104,9 @@ def post(id):
         db.session.commit()
         return redirect('/')
     elif 'edit' in request.form:
-        return redirect('/editpost')
+        return redirect(url_for('/editpost', id=post.id))
 
-    return render_template('posts/post.html', title='Post', post=post)
+    return render_template('posts/post.html', title='Пост', post=post)
 
 @app.route('/faq')
 def faq():
