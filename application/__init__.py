@@ -43,14 +43,13 @@ def main():
     recomended_communities = Community.query.all()
     form = PostForm()
     if form.validate_on_submit() and current_user.is_authenticated:
-        tags = findall('[a-z]{1,}|[a-z]{1,}\s[a-z]{1,}', form.tag.data.lower())
-
+        tags = findall('[a-z]{1,}|[а-я]{1,}', form.tag.data.lower())
         post = Post(theme=form.title.data, tags=tags, author=current_user.username, text=form.posts.data, likes=0, date_of_publication=datetime.datetime.now())
         db.session.add(post)
         db.session.commit()
-        flash('Пост успішно доданий на сайт!')
+        flash('Пост успішно доданий на сайт!', 'succes')
     elif not current_user.is_authenticated:
-        flash('Спочатку вам потрібно зареєструватися!')
+        flash('Спочатку вам потрібно зареєструватися!', 'error')
     return render_template('index.html', title='Reddit', posts=posts, recomended_communities=recomended_communities, form=form)
 
 
@@ -58,7 +57,7 @@ def main():
 def signup():
     form = Registration()
     if form.validate_on_submit():
-        user = User(name=form.name.data, username=form.username.data, email=form.email.data, password_hash=form.password.data)
+        user = User(name=form.name.data, username=form.username.data, email=form.email.data, password_hash=form.password.data, post_id=0)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
@@ -102,6 +101,7 @@ def post(id):
     if 'delete' in request.form:
         db.session.delete(post)
         db.session.commit()
+        flash('пост успішно видалений', 'succes')
         return redirect('/')
     elif 'edit' in request.form:
         return redirect(url_for('/editpost', id=post.id))
