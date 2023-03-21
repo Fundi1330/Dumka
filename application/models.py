@@ -16,7 +16,7 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(120))
     about_me = db.Column(db.String, index=True)
     interests = db.Column(ARRAY(db.String))
-    post_id = db.relationship('Post_id', backref='author')
+    post_id = db.relationship(db.Integer, db.ForeignKey('post_id'))
     avatar = db.Column(db.String, default='default.png')
 
     def set_password(self, password):
