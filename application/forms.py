@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField , FileField
 from wtforms.validators import DataRequired, Email
 from wtforms.validators import Length
 from hashlib import md5
@@ -10,7 +10,7 @@ class Registration(FlaskForm):  # Для реєстрації, треба html
     nickname = StringField('Користувач', validators=[DataRequired('Не може бути пусте')])
     password = PasswordField('Пароль', validators=[DataRequired('Не може бути пусте')])
     email = StringField('Почта', validators=[DataRequired('Не може бути пусте'), Email()])
-
+    recomendation = StringField('Що вам подобається?', validators=[DataRequired('Наприклад: Футбол, Програмування, Мйнкрафт...')])
     submit = SubmitField('Підтвердити')
 
 class Login(FlaskForm):  # Для входу, треба html
@@ -25,10 +25,7 @@ class EditForm(FlaskForm):  # Для того щоб миняти імя и тд
     name = StringField('Користувач', validators=[DataRequired('Не може бути пусте')])
     about_me = TextAreaField('Про мене', validators=[Length(min=0, max=500)])
     submit = SubmitField('Підтвердити')  # Кнопка
-
-    def avatar(self, size):
-        return """Силка на фото""" + md5(self.email).hexdigest() + '?d=mm&s=' + str(size)
-
+    avatar = FileField('!')     # ! == Назва файла
 
 class EditFormPrivat(FlaskForm):  # Теж треба бд
     # бд
