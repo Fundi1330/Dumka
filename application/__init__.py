@@ -10,6 +10,7 @@ from flask_admin.contrib.fileadmin import FileAdmin
 import os.path as op
 import datetime
 from re import findall
+from sqlalchemy import desc
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'StandWithUkraine'
@@ -39,12 +40,12 @@ def logout():
 @app.route('/', methods=['GET', 'POST']) #Головна сторінка
 @app.route('/index/', methods=['GET', 'POST'])
 def main():
-    posts = Post.query.order_by(Post.date_of_publication).all()
+    posts = Post.query.order_by(desc(Post.date_of_publication)).all()
     recomended_communities = Community.query.all()
     form = PostForm()
     if form.validate_on_submit() and current_user.is_authenticated:
         tags = findall('[a-z]{1,}|[а-я]{1,}', form.tag.data.lower())
-        post = Post(theme=form.title.data, tags=tags, author=current_user.username, text=form.posts.data, likes=0, date_of_publication=datetime.datetime.now())
+        post = Post(theme=form.title.data, tags=tags, author=current_user.username, author_id=current_user.id, text=form.posts.data, likes=0, date_of_publication=datetime.datetime.now())
         db.session.add(post)
         db.session.commit()
         flash('Пост успішно доданий на сайт!', 'succes')
@@ -57,10 +58,12 @@ def main():
 def signup():
     form = Registration()
     if form.validate_on_submit():
-        user = User(name=form.name.data, username=form.username.data, email=form.email.data, password_hash=form.password.data, post_id=0)
+        interests = findall('[a-z]{1,}|[а-я]{1,}', form.recomendation.data.lower())
+        user = User(name=form.name.data, username=form.username.data, email=form.email.data, password_hash=form.password.data, interests=interests)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
+        flash('Ви успішно зареєструвалися!', 'succes')
         return redirect(url_for('login'))
     return render_template('authorization/register.html', title='Реєстрація', form=form)
 

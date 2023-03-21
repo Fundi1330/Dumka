@@ -10,6 +10,7 @@ class Registration(FlaskForm):  # Для реєстрації, треба html
     username = StringField('Користувач', validators=[DataRequired('Не може бути пусте')])
     password = PasswordField('Пароль', validators=[DataRequired('Не може бути пусте')])
     email = StringField('Почта', validators=[DataRequired('Не може бути пусте'), Email()])
+    recomendation = StringField('Що вам подобається?', validators=[DataRequired('Наприклад: Футбол, Програмування, Мйнкрафт...')])
     submit = SubmitField('Підтвердити')
 
 class Login(FlaskForm):  # Для входу, треба html
@@ -41,8 +42,8 @@ class EditFormPrivat(FlaskForm):  # Теж треба бд
 
 class Posts(FlaskForm):  # Треба бд для додавання постів та коментів
     # бд
-    title = TextAreaField('Заголовок', validators=[Length(min=0, max=400), DataRequired('Не може бути пусте')])
-    posts = TextAreaField('Пост', validators=[Length(min=0, max=3000), DataRequired('Не може бути пусте')])
+    title = TextAreaField('Заголовок', validators=[Length(min=0, max=60), DataRequired('Не може бути пусте')])
+    posts = TextAreaField('Пост', validators=[Length(min=0, max=4000), DataRequired('Не може бути пусте')])
     tag = TextAreaField('Тег', validators=[Length(min=0, max=200), DataRequired('Не може бути пусте')])
     submit = SubmitField('Підтвердити')
 
