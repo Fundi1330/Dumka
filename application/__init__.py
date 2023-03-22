@@ -141,5 +141,6 @@ def edit_form_privat():
         db.session.commit()
     return render_template('edit_private_form.html', title='Зміна особистих данних', form=form)
 
+
 admin.add_view(FileAdmin(path, '/static/', name='files'))
 admin.add_view(ModelView(User, db.session, name='Користувачі'))
