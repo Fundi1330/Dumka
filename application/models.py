@@ -16,7 +16,7 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(120))
     about_me = db.Column(db.String, index=True)
     interests = db.Column(ARRAY(db.String))
-    posts = db.relationship('Post', backref='users', lazy=True)
+    posts = db.relationship('Post', backref='users', lazy='dynamic', primaryjoin="User.username == Post.author")
     avatar = db.Column(db.String, default='default.png')
 
     def set_password(self, password):
@@ -33,8 +33,7 @@ class Post(db.Model):
     text = db.Column(db.String(4000))
     date_of_publication = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     tags = db.Column(ARRAY(db.String))
-    author = db.Column(db.String, index=True)
-    author_id = db.Column(db.Integer, db.ForeignKey('User.id'), nullable=False)
+    author = db.Column(db.String, db.ForeignKey('User.username'), nullable=False)
     likes = db.Column(db.Integer, index=True)
 
 

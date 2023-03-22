@@ -45,7 +45,7 @@ def main():
     form = PostForm()
     if form.validate_on_submit() and current_user.is_authenticated:
         tags = findall('[a-z]{1,}|[а-я]{1,}', form.tag.data.lower())
-        post = Post(theme=form.title.data, tags=tags, author=current_user.username, author_id=current_user.id, text=form.posts.data, likes=0, date_of_publication=datetime.datetime.now())
+        post = Post(theme=form.title.data, tags=tags, users=current_user, text=form.posts.data, likes=0, date_of_publication=datetime.datetime.now())
         db.session.add(post)
         db.session.commit()
         flash('Пост успішно доданий на сайт!', 'succes')
@@ -87,7 +87,8 @@ def public():
 
 @app.route('/user/<username>') #декоратор для перегляду профілю
 def user(username):
-    return render_template('users/profile.html', title=username)
+    user = User.query.filter_by(username=username).first()
+    return render_template('users/profile.html', title=username, user=user)
 
 @app.route('/kind/<subreddit>') #Сабреддіт
 def kind(subreddit):
