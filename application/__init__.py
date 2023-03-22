@@ -44,7 +44,7 @@ def main():
     recomended_communities = Community.query.all()
     form = PostForm()
     if form.validate_on_submit() and current_user.is_authenticated:
-        tags = findall('[a-z]{1,}|[а-я]{1,}', form.tag.data.lower())
+        tags = findall('[a-z]{1,}|[а-їґ]{1,}', form.tag.data.lower())
         post = Post(theme=form.title.data, tags=tags, users=current_user, text=form.posts.data, likes=0, date_of_publication=datetime.datetime.now())
         db.session.add(post)
         db.session.commit()
@@ -58,7 +58,7 @@ def main():
 def signup():
     form = Registration()
     if form.validate_on_submit():
-        interests = findall('[a-z]{1,}|[а-я]{1,}', form.recomendation.data.lower())
+        interests = findall('[a-z]{1,}|[а-їґ]{1,}', form.recomendation.data.lower())
         user = User(name=form.name.data, username=form.username.data, email=form.email.data, password_hash=form.password.data, interests=interests)
         user.set_password(form.password.data)
         db.session.add(user)
@@ -88,7 +88,8 @@ def public():
 @app.route('/user/<username>') #декоратор для перегляду профілю
 def user(username):
     user = User.query.filter_by(username=username).first()
-    return render_template('users/profile.html', title=username, user=user)
+    posts = Post.query.filter_by(author=username).order_by(desc(Post.date_of_publication)).all()
+    return render_template('users/profile.html', title=username, user=user, posts=posts)
 
 @app.route('/kind/<subreddit>') #Сабреддіт
 def kind(subreddit):
