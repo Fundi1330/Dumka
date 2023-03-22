@@ -6,24 +6,25 @@ from hashlib import md5
 
 
 class Registration(FlaskForm):  # Для реєстрації, треба html
-    name = StringField('Імя', validators=[DataRequired()])
-    nickname = StringField('Користувач', validators=[DataRequired('Не мже бути пусте')])
-    password = PasswordField('Пароль', validators=[DataRequired('Не мже бути пусте')])
-    email = StringField('Почта', validators=[DataRequired(), Email()])
-    remember_me = BooleanField('Запамятай мене!')
-
+    name = StringField('Імя', validators=[DataRequired('Не може бути пусте')])
+    username = StringField('Користувач', validators=[DataRequired('Не може бути пусте')])
+    password = PasswordField('Пароль', validators=[DataRequired('Не може бути пусте')])
+    email = StringField('Почта', validators=[DataRequired('Не може бути пусте'), Email()])
+    recomendation = StringField('Що вам подобається?', validators=[DataRequired('Наприклад: Футбол, Програмування, Мйнкрафт...')])
+    submit = SubmitField('Підтвердити')
 
 class Login(FlaskForm):  # Для входу, треба html
-    nickname = StringField('Користувач', validators=[DataRequired()])
-    password = PasswordField('Пароль', validators=[DataRequired('Не мже бути пусте')])
-
+    username = StringField('Користувач', validators=[DataRequired('Не може бути пусте')])
+    password = PasswordField('Пароль', validators=[DataRequired('Не може бути пусте')])
+    submit = SubmitField('Підтвердити')
+    remember_me = BooleanField('Запамятай мене!')
 
 class EditForm(FlaskForm):  # Для того щоб миняти імя и тд треба бд
     # бд
 
-    nickname = StringField('Користувач', validators=[DataRequired()])
-    about_me = TextAreaField('Про мене', validators=[Length(min=0, max=140)])
-    # submit = SubmitField('Submit')  # Кнопка
+    name = StringField('Користувач', validators=[DataRequired('Не може бути пусте')])
+    about_me = TextAreaField('Про мене', validators=[Length(min=0, max=500)])
+    submit = SubmitField('Підтвердити')  # Кнопка
 
     def avatar(self, size):
         return """Силка на фото""" + md5(self.email).hexdigest() + '?d=mm&s=' + str(size)
@@ -33,19 +34,19 @@ class EditFormPrivat(FlaskForm):  # Теж треба бд
     # бд
 
 
-    nickname = StringField('Користувач', validators=[DataRequired()])
-    password = PasswordField('Пароль', validators=[DataRequired('Не мже бути пусте')])
-    email = StringField('Почта', validators=[DataRequired(), Email()])
-    # submit = SubmitField('Submit')  # Кнопка
+    username = StringField('Користувач', validators=[DataRequired('Не може бути пусте')])
+    password = PasswordField('Пароль', validators=[DataRequired('Не може бути пусте')])
+    email = StringField('Почта', validators=[DataRequired('Не може бути пусте'), Email()])
+    submit = SubmitField('Підтвердити')  # Кнопка
 
 
 class Posts(FlaskForm):  # Треба бд для додавання постів та коментів
     # бд
-
-    title = TextAreaField('Заголовок', validators=[Length(min=0, max=130)])
-    posts = TextAreaField('Пост', validators=[Length(min=0, max=350)])
-    tag = TextAreaField('Тег', validators=Length(min=0, max=100))
-
+    title = TextAreaField('Заголовок', validators=[Length(min=0, max=60), DataRequired('Не може бути пусте')])
+    posts = TextAreaField('Пост', validators=[Length(min=0, max=4000), DataRequired('Не може бути пусте')])
+    tag = TextAreaField('Тег', validators=[Length(min=0, max=200), DataRequired('Не може бути пусте')])
+    submit = SubmitField('Підтвердити')
 
 class Comment(FlaskForm):
-    comets = TextAreaField('Коментувати', validators=[Length(min=0, max=300)])
+    comets = TextAreaField('Коментувати', validators=[Length(min=0, max=800), DataRequired('Не може бути пусте')])
+    submit = SubmitField('Підтвердити')
