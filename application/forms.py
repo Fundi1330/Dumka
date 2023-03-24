@@ -3,6 +3,7 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextA
 from wtforms.validators import DataRequired, Email
 from wtforms.validators import Length
 from hashlib import md5
+from flask_ckeditor import CKEditorField
 
 
 class Registration(FlaskForm):  # Для реєстрації, треба html
@@ -40,7 +41,7 @@ class EditFormPrivat(FlaskForm):  # Теж треба бд
 class Posts(FlaskForm):  # Треба бд для додавання постів та коментів
     # бд
     title = TextAreaField('Заголовок', validators=[Length(min=0, max=400, message='За над то багато символив'), DataRequired('Не може бути пусте')])
-    posts = TextAreaField('Пост', validators=[Length(min=0, max=1800, message='За над то багато символив'), DataRequired('Не може бути пусте')])
+    posts = CKEditorField('Пост', validators=[Length(min=0, max=1800, message='За над то багато символив'), DataRequired('Не може бути пусте')])
     tag = TextAreaField('Теги', validators=[Length(min=0, max=200, message='За над то багато символив'), DataRequired('Не може бути пусте')])
     submit = SubmitField('Підтвердити')
 

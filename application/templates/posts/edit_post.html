@@ -17,6 +17,8 @@
     {% for error in form.tag.errors %}
         <p style="color: red;">[{{error}}]</p>
     {% endfor %}
+    {{ ckeditor.load() }}
+    {{ ckeditor.config(name='posts') }}
     {{ form.submit(class_='btn btn-primary m-2')}}
 </form>
 {% endblock %}

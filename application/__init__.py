@@ -11,11 +11,14 @@ import os.path as op
 import datetime
 from re import findall
 from sqlalchemy import desc
+from flask_ckeditor import CKEditor
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'StandWithUkraine'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:12345678990@localhost:5432/alya_redit'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config['CKEDITOR_PKG_TYPE'] = 'basic'
+ckeditor = CKEditor(app)
 path = op.join(op.dirname(__file__), 'static')
 
 db.init_app(app)
@@ -111,7 +114,7 @@ def edit_post(id):
         tags = findall('[a-z]{1,}|[а-їґ]{1,}', form_P.tag.data.lower())
         post.tags = tags
         db.session.commit()
-        # return redirect('/index')
+        return redirect('/index')
     return render_template('posts/edit_post.html', title='Зміни свій пост', form=form_P, post=post)
 
 @app.route('/post/<int:id>', methods=['GET', 'POST'])

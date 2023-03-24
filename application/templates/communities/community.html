@@ -12,7 +12,7 @@
                 <a class="text-decoration-none text-black" href="{{ url_for('user', username=post.author) }}"><h6>Автор: {{ post.author }}</h6></a>
                 <h3 class="post__header">{{ post.theme }}</h3>
                 <p class="post__body">
-                    {{ post.text }}
+                    {{ post.text|safe }}
                 </p>
                 <div class="tags">
                     <ul class="p-0">
