@@ -35,6 +35,7 @@ class Post(db.Model):
     tags = db.Column(ARRAY(db.String))
     author = db.Column(db.String, db.ForeignKey('User.username'), nullable=False)
     likes = db.Column(db.Integer, index=True)
+    comments = db.relationship('Comment', backref='comment', lazy='dynamic', primaryjoin='Post.id == Comment.post_id')
 
 
     def __repr__(self) -> str:
@@ -52,7 +53,7 @@ class Community(db.Model):
 class Comment(db.Model):
     __tablename__ = 'Comment'
     id = db.Column(db.Integer, primary_key=True)
-    post = db.Column(db.Integer, index=True)
+    post_id = db.Column(db.Integer, db.ForeignKey('Post.id'))
     author = db.Column(db.String, index=True)
     text = db.Column(db.String(1500), index=True)
     date_of_publication = db.Column(db.DateTime, index=True, default=datetime.utcnow)

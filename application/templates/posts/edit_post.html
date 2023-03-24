@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
-<form action="" method="post" class="">
-    {{ form.hidden_tag() }}
+<form action="" method="post" class="p-2 justify-content-center form-inline">
+    {{ form.csrf_token() }}
     {{ form.title.label }}
     {{ form.title(class_='form-control m-2') }}
     {% for error in form.title.errors %}

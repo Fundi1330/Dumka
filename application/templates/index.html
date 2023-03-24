@@ -38,7 +38,7 @@
                 <section class="likes d-flex h-100  m-0">
                     <p>{{ post.likes }}</p>
                 </section>
-                <a class="text-decoration-none text-black" href="{{ url_for('user', username=post.author) }}"><h6>Автор: {{ post.author }}</h6></a>
+                <h6>Автор: {{ post.author }}</h6>
                 <h3 class="post__header">{{ post.theme }}</h3>
                 <p class="post__body">
                     {{ post.text }}

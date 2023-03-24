@@ -5,7 +5,7 @@
             <section class="likes d-flex h-100  m-0">
                 <p>{{ post.likes }}</p>
             </section>
-            <h6>Автор: {{ post.author }}</h6>
+            <a class="text-decoration-none text-black" href="{{ url_for('user', username=post.author) }}"><h6>Автор: {{ post.author }}</h6></a>
             <h3 class="post__header">{{ post.theme }}</h3>
             <p class="post__body">
                 {{ post.text }}
@@ -33,7 +33,22 @@
     </section>
     <section class="comments">
         <form action="" method="post" class="">
-            
+            {{ form.hidden_tag() }}
+            {{ form.comets.label }}
+            {{ form.comets(class_='form-control m-2') }}
+            {% for error in form.comets.errors %}
+                <p style="color: red;">[{{error}}]</p>
+            {% endfor %}
+            {{ form.submit(class_='btn btn-primary m-2')}}
         </form>
+        <ul class="mx-0">
+            {% for comment in comments %}
+            <li class="comment border rounded p-3 my-3">
+                <a class="text-decoration-none text-black" href="{{ url_for('user', username=comment.author) }}"><h3>{{ comment.author }}</h3></a>
+                <p>{{ comment.text }}</p>
+            </li>
+            
+            {% endfor %}
+        </ul>
     </section>
 {% endblock %}

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="d-flex p-4">
-    <section class="posts m-4">
+    <section class="user-posts m-4">
         <h2>Пости:</h2>
         {% for post in posts %}
         <a href="{{ url_for('post', id=post.id)}}" class="border-info text-decoration-none text-black">

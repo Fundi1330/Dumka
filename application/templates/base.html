@@ -12,9 +12,11 @@
     <header class="header bg-primary mb-3 sticky-top">
         <nav class="navbar navbar-dark bg-primary h-100 px-5 d-flex bd-highlight">
             <a href="/" class="me-auto nav-link px-2 link-light">Головна</a>
-            <form class="col-lg-auto d-none d-sm-block mb-lg-0 me-3 align-items-end">
-                <input type="search" class="form-control" placeholder="Пошук" aria-label="Search">
-            </form>
+            <a href="/search" class="nav-link px-2 link-light">
+                <form class="col-lg-auto d-none d-sm-block mb-lg-0 me-3 align-items-end">
+                    <input type="search" class="form-control" placeholder="Пошук" aria-label="Search">
+                </form>
+            </a>
             {% if current_user.is_authenticated %}
                 <div class="dropdown text-end">
                     <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
@@ -22,6 +24,8 @@
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownUser1">
                         <li><a class="dropdown-item" href="{{ url_for('user', username=current_user.username) }}">Профіль</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/addcommunity">Створити ком'юніті</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="/editformprivate">Змінити приватні дані</a></li>
                         <li><hr class="dropdown-divider"></li>
