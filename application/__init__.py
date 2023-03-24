@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flash, redirect, url_for, request
+from flask import Flask, render_template, flash, redirect, url_for, request, session
 from flask_login import current_user, LoginManager, login_user, logout_user
 from .models import User, Post, Community, db
 from flask_migrate import Migrate
@@ -96,7 +96,9 @@ def kind(subreddit):
 
 @app.route('/editpost')
 def edit_post():
-    return render_template('edit_post.html', title='Зміни свій пост')
+    form = PostForm()
+    form.title.data = session['post']
+    return render_template('posts/edit_post.html', title='Зміни свій пост', form=form)
 
 @app.route('/post/<int:id>', methods=['GET', 'POST'])
 def post(id):
@@ -108,7 +110,7 @@ def post(id):
         flash('пост успішно видалений', 'succes')
         return redirect('/')
     elif 'edit' in request.form:
-        return redirect(url_for('/editpost', id=post.id))
+        return redirect(url_for('edit_post'))
 
     return render_template('posts/post.html', title='Пост', post=post)
 
@@ -136,7 +138,6 @@ def edit_form_privat():
     user = User.query.filter_by(id=current_user.id).first()
     form = EditFormPrivat()
     if form.validate_on_submit():
-        user.username = form.username.data
         user.password_hash = user.set_password(form.password.data)
         user.email = form.email.data
         db.session.commit()

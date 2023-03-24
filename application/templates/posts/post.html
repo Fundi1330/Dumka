@@ -2,7 +2,7 @@
 {% block content %}
     <section class="post">
         <div class="border rounded p-3 my-3">
-            <section class="likes d-flex h-100 bg-info m-0">
+            <section class="likes d-flex h-100  m-0">
                 <p>{{ post.likes }}</p>
             </section>
             <h6>Автор: {{ post.author }}</h6>
@@ -30,5 +30,10 @@
                 </label>
             </form>
     {% endif %}
+    </section>
+    <section class="comments">
+        <form action="" method="post" class="">
+            
+        </form>
     </section>
 {% endblock %}

@@ -35,7 +35,7 @@
         {% for post in posts %}
         <a href="{{ url_for('post', id=post.id)}}" class="border-info text-decoration-none text-black">
             <div class="border rounded p-3 my-3">
-                <section class="likes d-flex h-100 bg-info m-0">
+                <section class="likes d-flex h-100  m-0">
                     <p>{{ post.likes }}</p>
                 </section>
                 <a class="text-decoration-none text-black" href="{{ url_for('user', username=post.author) }}"><h6>Автор: {{ post.author }}</h6></a>
