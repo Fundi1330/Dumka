@@ -208,6 +208,7 @@ def search():
 
     return render_template('search.html', title='Пошук', form=form)
 
+
 @app.route('/addcommunity', methods=['GET', 'POST'])
 def add_community():
     form = Community()
