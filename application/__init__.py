@@ -1,20 +1,23 @@
-from flask import Flask, render_template, flash, redirect, url_for, request
-from .forms import Registration, Login, EditForm, EditFormPrivat, Search
+from flask import Flask, render_template, flash, redirect, url_for, request, abort
 from flask_login import current_user, LoginManager, login_user, logout_user
-from .models import User, Post, Community, db
+from .models import User, Post, db, Comment
+from .models import Community as Coommunity
 from flask_migrate import Migrate
+from .forms import EditForm, EditFormPrivat, Registration, Login, Search
 from .forms import Posts as PostForm
+from .models import Community
+from .forms import Comment as CommentForm
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.contrib.fileadmin import FileAdmin
 import os.path as op
 import datetime
 from re import findall
-from sqlalchemy import desc, update
+from sqlalchemy import desc
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'StandWithUkraine'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:12345678990@localhost:5432/alya_redit'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:dima20+20@localhost:5432/alya_redit'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 path = op.join(op.dirname(__file__), 'static')
 
@@ -44,12 +47,30 @@ def main():
     recomended_communities = Community.query.all()
     form = PostForm()
     if form.validate_on_submit() and current_user.is_authenticated:
-        tags = findall('[a-z]{1,}|[а-я]{1,}', form.tag.data.lower())
-        post = Post(theme=form.title.data, tags=tags, users=current_user, text=form.posts.data, likes=0, date_of_publication=datetime.datetime.now())
+
+
+        # tag_list = form.tag.data.split(', ')
+        # flash(tag_list)
+        # tags = ' '.join(tag_list)
+        # flash(tags)
+        # changed_tags = tags.replace('[', '{').replace(']', '}').replace('\'', '\"').replace('\" \"', '')
+        # flash(changed_tags)
+        tags = findall('[a-z]{1,}', form.tag.data.lower())
+        flash(tags)
+        tags = findall('[a-z]{1,}|[a-z]{1,}\s[a-z]{1,}', form.tag.data.lower())
+        post = Post(theme=form.title.data, tags=tags, author=current_user.username, text=form.posts.data, likes=0, date_of_publication=datetime.datetime.now())
+        db.session.add(post)
+        db.session.commit()
+        flash('Пост успішно доданий на сайт!')
+        return redirect('index')
+    elif not current_user.is_authenticated:
+        flash('Спочатку вам потрібно зареєструватися!')
+        tags = findall('[a-z]{1,}|[а-їґ]{1,}', form.tag.data.lower())
+        post = Post(theme=form.title.data, tags=tags, users=current_user, text=form.posts.data, likes=0, date_of_publication=datetime.datetime.now(), comments=[])
         db.session.add(post)
         db.session.commit()
         flash('Пост успішно доданий на сайт!', 'succes')
-    elif not current_user.is_authenticated:
+    elif not current_user.is_authenticated and form.validate_on_submit():
         flash('Спочатку вам потрібно зареєструватися!', 'error')
     return render_template('index.html', title='Reddit', posts=posts, recomended_communities=recomended_communities, form=form)
 
@@ -58,7 +79,7 @@ def main():
 def signup():
     form = Registration()
     if form.validate_on_submit():
-        interests = findall('[a-z]{1,}|[а-я]{1,}', form.recomendation.data.lower())
+        interests = findall('[a-z]{1,}|[а-їґ]{1,}', form.recomendation.data.lower())
         user = User(name=form.name.data, username=form.username.data, email=form.email.data, password_hash=form.password.data, interests=interests)
         user.set_password(form.password.data)
         db.session.add(user)
@@ -88,19 +109,46 @@ def public():
 @app.route('/user/<username>') #декоратор для перегляду профілю
 def user(username):
     user = User.query.filter_by(username=username).first()
-    return render_template('users/profile.html', title=username, user=user)
+    posts = Post.query.filter_by(author=username).order_by(desc(Post.date_of_publication)).all()
+    return render_template('users/profile.html', title=username, user=user, posts=posts)
 
 @app.route('/kind/<subreddit>') #Сабреддіт
 def kind(subreddit):
     return render_template('kind.html', title='Сабреддіт')
 
-@app.route('/editpost')
-def edit_post():
-    return render_template('edit_post.html', title='Зміни свій пост')
+@app.route('/editpost/<int:id>', methods=['GET', 'POST'])
+def edit_post(id):
+    form_P = PostForm()
+    post = Post.query.filter_by(id=id).first()
+    if current_user.username != post.author:
+        abort(404)
+    if request.method == 'GET':
+        form_P.title.data = post.theme
+        form_P.posts.data = post.text
+        form_P.tag.data = ', '.join(post.tags)
+    if form_P.validate_on_submit():
+        post.theme = form_P.title.data
+        post.text = form_P.posts.data
+        tags = findall('[a-z]{1,}|[а-їґ]{1,}', form_P.tag.data.lower())
+        post.tags = tags
+        db.session.commit()
+        # return redirect('/index')
+    return render_template('posts/edit_post.html', title='Зміни свій пост', form=form_P, post=post)
 
 @app.route('/post/<int:id>', methods=['GET', 'POST'])
 def post(id):
     post = Post.query.filter_by(id=id).first()
+    comments = post.comments
+    ordered_comments = comments.order_by(desc(Comment.date_of_publication))
+    form = CommentForm()
+
+    if form.validate_on_submit() and current_user.is_authenticated:
+        comment = Comment(author=current_user.username, text=form.comets.data, date_of_publication=datetime.datetime.now(), post_id=post.id)
+        db.session.add(comment)
+        db.session.commit()
+        flash('Комментар успішно доданий на сайт!', 'succes')
+    elif not current_user.is_authenticated and form.validate_on_submit():
+        flash('Спочатку вам потрібно зареєструватися!', 'error')
 
     if 'delete' in request.form:
         db.session.delete(post)
@@ -108,9 +156,9 @@ def post(id):
         flash('пост успішно видалений', 'succes')
         return redirect('/')
     elif 'edit' in request.form:
-        return redirect(url_for('/editpost', id=post.id))
+        return redirect(url_for('edit_post', id=post.id))
 
-    return render_template('posts/post.html', title='Пост', post=post)
+    return render_template('posts/post.html', title='Пост', post=post, form=form, comments=ordered_comments)
 
 @app.route('/faq')
 def faq():
@@ -120,34 +168,57 @@ def faq():
 def about_us():
     return render_template('footer/about_us.html', title="About us")
 
-@app.route('/editform', method=['GET', 'POST'])
+@app.route('/editform', methods=['GET', 'POST'])
 def edit_form():
-    akkk = User.query.filter_by(id=current_user.id).first()
-    form = EditForm()
-    if form.validate_on_submit():
-        akkk.name = form.name.data
-        akkk.about_me = form.about_me.data
+    user = User.query.filter_by(id=current_user.id).first()
+    form_EF = EditForm()
+    if request.method == 'GET':
+        form_EF.name.data = user.name
+        form_EF.about_me.data = user.about_me
+
+    if form_EF.validate_on_submit():
+        user.name = form_EF.name.data
+        user.about_me = form_EF.about_me.data
         db.session.commit()
-    return render_template('edit_form', title='Зміна данних', form=form)
+        return redirect(url_for('user', username=current_user.username))
+    return render_template('users/edit_profile.html', title='Зміна данних', form=form_EF)
 
 @app.route('/editformprivate', methods=['GET', 'POST'])
 def edit_form_privat():
-    akkk = User.query.filter_by(id=current_user.id).first()
-    form = EditFormPrivat()
-    if form.validate_on_submit():
-        akkk.username = form.username.data
-        akkk.password_hash = akkk.set_password(form.password.data)
-        akkk.email = form.email.data
+    user = User.query.filter_by(id=current_user.id).first()
+    form_EFP = EditFormPrivat()
+    if request.method == 'GET':
+        form_EFP.email.data = user.email
+        form_EFP.password.data = user.check_password(user.password_hash)
+
+    if form_EFP.validate_on_submit():
+        user.password_hash = user.set_password(form_EFP.password.data)
+        user.email = form_EFP.email.data
         db.session.commit()
-    return render_template('edit_private_form.html', title='Зміна особистих данних', form=form)
+        return redirect(url_for('user', username=current_user.username))
+    return render_template('users/edit_private_data.html', title='Зміна особистих данних', form=form_EFP)
 
-
-@app.route('/search/<str:post>', methods=['GET', 'POST'])
-def search(post):
+@app.route('/search', methods=['GET', 'POST'])
+def search():
     form = Search()
     if form.validate_on_submit():
-        posts = Post.query.filter_by(Post.theme == f'{post}').all()
-        return render_template('search.html', title='Пошук', form=form)
+        Poost = Post.query.filter_by(Post.theme == f'{Search.search}').all()
+    else:
+        flash('Пост не знайдено', 'error')
+
+    return render_template('search.html', title='Пошук', form=form)
+
+@app.route('/addcommunity', methods=['GET', 'POST'])
+def add_community():
+    form = Community()
+    if form.validate_on_submit():
+        community = Coommunity(name=form.name.data, themes=form.tema.data, description=form.description.data)
+        db.session.add(community)
+        db.session.commit()
+
+    return render_template('communities/community')
+
+
 
 
 admin.add_view(FileAdmin(path, '/static/', name='files'))
