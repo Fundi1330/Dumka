@@ -30,11 +30,6 @@ class EditForm(FlaskForm):  # Для того щоб миняти імя и тд
     avatar = FileField('!')  # ! == Назва файла
 
 
-form_EF = EditForm()
-form_EF.name.data = user.name
-form_EF.about_me.data = user.about_me
-
-
 class EditFormPrivat(FlaskForm):  # Теж треба бд
     # бд
 
@@ -42,12 +37,6 @@ class EditFormPrivat(FlaskForm):  # Теж треба бд
     password = PasswordField('Пароль', validators=[DataRequired('Не може бути пусте')])
     email = StringField('Почта', validators=[DataRequired('Не може бути пусте'), Email(message='Email не існує')])
     submit = SubmitField('Підтвердити')  # Кнопка
-
-
-form_EFP = EditFormPrivat()
-form_EFP.username.data = user.name
-form_EFP.email.data = user.email
-form_EFP.password.data = user.password_hash
 
 
 class Posts(FlaskForm):  # Треба бд для додавання постів та коментів
@@ -62,13 +51,12 @@ class Posts(FlaskForm):  # Треба бд для додавання пості�
     submit = SubmitField('Підтвердити')
 
 
-form_P = Posts()
-form_P.title.data = post.theme
-form_P.posts.data = post.text
-form_P.tag.data = post.tags
-
-
 class Comment(FlaskForm):
     comets = TextAreaField('Коментувати', validators=[Length(min=0, max=800, message='За над то багато символив'),
                                                       DataRequired('Не може бути пусте')])
     submit = SubmitField('Підтвердити')
+
+
+class Search(FlaskForm):
+    search = StringField('Пошук', validators=[Length(min=0, max=400, message='За над то багато символив'),
+                                              DataRequired('Не може бути пусте')])
