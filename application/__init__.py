@@ -142,5 +142,9 @@ def edit_form_privat():
     return render_template('edit_private_form.html', title='Зміна особистих данних', form=form)
 
 
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+
+
 admin.add_view(FileAdmin(path, '/static/', name='files'))
 admin.add_view(ModelView(User, db.session, name='Користувачі'))

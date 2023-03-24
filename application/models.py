@@ -1,61 +1,62 @@
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin
-from werkzeug.security import generate_password_hash, check_password_hash
-from sqlalchemy.dialects.postgresql import ARRAY
-from datetime import datetime
-
-db = SQLAlchemy()
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, FileField
+from wtforms.validators import DataRequired, Email
+from wtforms.validators import Length
 
 
-class User(db.Model, UserMixin):
-    __tablename__ = 'User'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, index=True)
-    username = db.Column(db.String(120), index=True, unique=True)
-    email = db.Column(db.String(60), index=True, unique=True)
-    password_hash = db.Column(db.String(120))
-    about_me = db.Column(db.String, index=True)
-    interests = db.Column(ARRAY(db.String))
-    posts = db.relationship('Post', backref='users', lazy='dynamic', primaryjoin="User.username == Post.author")
-    avatar = db.Column(db.String, default='default.png')
-
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
-    def __repr__(self) -> str:
-        return '<User {}'.format(self.username)
-
-class Post(db.Model):
-    __tablename__ = 'Post'
-    id = db.Column(db.Integer, primary_key=True)
-    theme = db.Column(db.String(60))
-    text = db.Column(db.String(4000))
-    date_of_publication = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    tags = db.Column(ARRAY(db.String))
-    author = db.Column(db.String, db.ForeignKey('User.username'), nullable=False)
-    likes = db.Column(db.Integer, index=True)
+class Registration(FlaskForm):  # Для реєстрації, треба html
+    name = StringField('Імя', validators=[DataRequired('Не може бути пусте')])
+    nickname = StringField('Користувач', validators=[DataRequired('Не може бути пусте')])
+    password = PasswordField('Пароль', validators=[DataRequired('Не може бути пусте')])
+    email = StringField('Почта', validators=[DataRequired('Не може бути пусте'), Email(message='Email не існує')])
+    recomendation = StringField('Що вам подобається?',
+                                validators=[DataRequired('Наприклад: Футбол, Програмування, Мйнкрафт...')])
+    submit = SubmitField('Підтвердити')
 
 
-    def __repr__(self) -> str:
-        return '<Post {}'.format(self.author)
+class Login(FlaskForm):  # Для входу, треба html
+    nickname = StringField('Користувач', validators=[DataRequired('Не може бути пусте')])
+    password = PasswordField('Пароль', validators=[DataRequired('Не може бути пусте')])
+    submit = SubmitField('Підтвердити')
+    remember_me = BooleanField('Запамятай мене!')
 
 
-class Community(db.Model):
-    __tablename__ = 'Community'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, index=True)
-    description = db.Column(db.String(300), index=True)
+class EditForm(FlaskForm):  # Для того щоб миняти імя и тд треба бд
+    # бд
 
-    def __repr__(self) -> str:
-        return '<Community{}'.format(self.name)
-class Comment(db.Model):
-    __tablename__ = 'Comment'
-    id = db.Column(db.Integer, primary_key=True)
-    post = db.Column(db.Integer, index=True)
-    author = db.Column(db.String, index=True)
-    text = db.Column(db.String(1500), index=True)
-    date_of_publication = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    name = StringField('Користувач', validators=[DataRequired('Не може бути пусте')])
+    about_me = TextAreaField('Про мене', validators=[Length(min=0, max=500, message='За над то багато символив')])
+    submit = SubmitField('Підтвердити')  # Кнопка
+    avatar = FileField('!')  # ! == Назва файла
 
-    def __repr__(self) -> str:
-        return '<Comment{}'.format(self.author)
+
+class EditFormPrivat(FlaskForm):  # Теж треба бд
+    # бд
+
+    username = StringField('Користувач', validators=[DataRequired('Не може бути пусте')])
+    password = PasswordField('Пароль', validators=[DataRequired('Не може бути пусте')])
+    email = StringField('Почта', validators=[DataRequired('Не може бути пусте'), Email(message='Email не існує')])
+    submit = SubmitField('Підтвердити')  # Кнопка
+
+
+class Posts(FlaskForm):  # Треба бд для додавання постів та коментів
+    # бд
+
+    title = TextAreaField('Заголовок', validators=[Length(min=0, max=400, message='За над то багато символив'),
+                                                   DataRequired('Не може бути пусте')])
+    posts = TextAreaField('Пост', validators=[Length(min=0, max=1800, message='За над то багато символив'),
+                                              DataRequired('Не може бути пусте')])
+    tag = TextAreaField('Тег', validators=[Length(min=0, max=200, message='За над то багато символив'),
+                                           DataRequired('Не може бути пусте')])
+    submit = SubmitField('Підтвердити')
+
+
+class Comment(FlaskForm):
+    comets = TextAreaField('Коментувати', validators=[Length(min=0, max=800, message='За над то багато символив'),
+                                                      DataRequired('Не може бути пусте')])
+    submit = SubmitField('Підтвердити')
+
+
+class Search(FlaskForm):
+    search = StringField('Пошук', validators=[Length(min=0, max=400, message='За над то багато символив'),
+                                              DataRequired('Не може бути пусте')])
