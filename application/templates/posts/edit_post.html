@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<form action="" method="post" class="p-2 justify-content-center form-inline">
+    {{ form.csrf_token() }}
+    {{ form.title.label }}
+    {{ form.title(class_='form-control m-2') }}
+    {% for error in form.title.errors %}
+        <p style="color: red;">[{{error}}]</p>
+    {% endfor %}
+    {{ form.posts.label }}
+    {{ form.posts(class_='form-control m-2') }}
+    {% for error in form.posts.errors %}
+        <p style="color: red;">[{{error}}]</p>
+    {% endfor %}
+    {{ form.tag.label }}
+    {{ form.tag(class_='form-control m-2') }}
+    {% for error in form.tag.errors %}
+        <p style="color: red;">[{{error}}]</p>
+    {% endfor %}
+    {{ ckeditor.load() }}
+    {{ ckeditor.config(name='posts') }}
+    {{ form.submit(class_='btn btn-primary m-2')}}
+</form>
+{% endblock %}

@@ -2,6 +2,11 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, FileField
 from wtforms.validators import DataRequired, Email
 from wtforms.validators import Length
+<<<<<<< HEAD
+=======
+from hashlib import md5
+from flask_ckeditor import CKEditorField
+>>>>>>> c1eefd1 (added text editor)
 
 
 class Registration(FlaskForm):  # Для реєстрації, треба html
@@ -41,6 +46,7 @@ class EditFormPrivat(FlaskForm):  # Теж треба бд
 
 class Posts(FlaskForm):  # Треба бд для додавання постів та коментів
     # бд
+<<<<<<< HEAD
 
     title = TextAreaField('Заголовок', validators=[Length(min=0, max=400, message='За над то багато символив'),
                                                    DataRequired('Не може бути пусте')])
@@ -48,6 +54,11 @@ class Posts(FlaskForm):  # Треба бд для додавання пості�
                                               DataRequired('Не може бути пусте')])
     tag = TextAreaField('Тег', validators=[Length(min=0, max=200, message='За над то багато символив'),
                                            DataRequired('Не може бути пусте')])
+=======
+    title = TextAreaField('Заголовок', validators=[Length(min=0, max=400, message='За над то багато символив'), DataRequired('Не може бути пусте')])
+    posts = CKEditorField('Пост', validators=[Length(min=0, max=1800, message='За над то багато символив'), DataRequired('Не може бути пусте')])
+    tag = TextAreaField('Теги', validators=[Length(min=0, max=200, message='За над то багато символив'), DataRequired('Не може бути пусте')])
+>>>>>>> c1eefd1 (added text editor)
     submit = SubmitField('Підтвердити')
 
 
