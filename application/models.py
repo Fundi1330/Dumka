@@ -16,7 +16,7 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(120))
     about_me = db.Column(db.String, index=True)
     interests = db.Column(ARRAY(db.String))
-    posts = db.relationship('Post', backref='users', lazy='dynamic')
+    posts = db.relationship('Post', backref='users', lazy='dynamic', primaryjoin="User.username == Post.author")
     avatar = db.Column(db.String, default='default.png')
 
     def set_password(self, password):
@@ -33,8 +33,9 @@ class Post(db.Model):
     text = db.Column(db.String(4000))
     date_of_publication = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     tags = db.Column(ARRAY(db.String))
-    author = db.Column(db.String, db.ForeignKey('user.id'))
+    author = db.Column(db.String, db.ForeignKey('user.id'), nullable=False)
     likes = db.Column(db.Integer, index=True)
+    comments = db.relationship('Comment', backref='comment', lazy='dynamic')
 
 
     def __repr__(self) -> str:
@@ -54,7 +55,7 @@ class Community(db.Model):
 class Comment(db.Model):
     __tablename__ = 'Comment'
     id = db.Column(db.Integer, primary_key=True)
-    post = db.Column(db.Integer, index=True)
+    post = db.Column(db.Integer, db.ForeignKey('post.id'))
     author = db.Column(db.String, index=True)
     text = db.Column(db.String(1500), index=True)
     date_of_publication = db.Column(db.DateTime, index=True, default=datetime.utcnow)
