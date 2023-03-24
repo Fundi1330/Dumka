@@ -1,5 +1,5 @@
 from flask import Flask, render_template, flash, redirect, url_for, request
-from .forms import Registration, Login, EditForm, EditFormPrivat
+from .forms import Registration, Login, EditForm, EditFormPrivat, Search
 from flask_login import current_user, LoginManager, login_user, logout_user
 from .models import User, Post, Community, db
 from flask_migrate import Migrate
@@ -142,8 +142,12 @@ def edit_form_privat():
     return render_template('edit_private_form.html', title='Зміна особистих данних', form=form)
 
 
-@app.route('/search', methods=['GET', 'POST'])
-def search():
+@app.route('/search/<str:post>', methods=['GET', 'POST'])
+def search(post):
+    form = Search()
+    if form.validate_on_submit():
+        posts = Post.query.filter_by(Post.theme == f'{post}').all()
+        return render_template('search.html', title='Пошук', form=form)
 
 
 admin.add_view(FileAdmin(path, '/static/', name='files'))
