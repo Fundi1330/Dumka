@@ -1,17 +1,19 @@
 {% extends 'base.html' %}
 {% block content %}
-<form action="" method="post">
-    {{ form.hidden_tag() }}
-    {{ form.name.label }}
-    {{ form.name(class_='form-control') }}
-    {% for error in form.name.errors %}
-        <p style="color: red;">[{{error}}]</p>
-    {% endfor %}
-    {{ form.about_me.label }}
-    {{ form.about_me(class_='form-control') }}
-    {% for error in form.about_me.errors %}
-        <p style="color: red;">[{{error}}]</p>
-    {% endfor %}
-    {{ form.submit(class_='form__submit') }}
-</form>
+<div class="form text-center row justify-content-center">
+    <form action="" method="post" class="col-6 p-2 justify-content-center form-inline">
+        {{ form.hidden_tag() }}
+        {{ form.name.label }}
+        {{ form.name(class_='form-control') }}
+        {% for error in form.name.errors %}
+            <p style="color: red;">[{{error}}]</p>
+        {% endfor %}
+        {{ form.about_me.label }}
+        {{ form.about_me(class_='form-control') }}
+        {% for error in form.about_me.errors %}
+            <p style="color: red;">[{{error}}]</p>
+        {% endfor %}
+        {{ form.submit(class_='form-control my-3 col-sm-3') }}
+    </form>
+</div>
 {% endblock %}

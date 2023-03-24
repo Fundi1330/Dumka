@@ -17,14 +17,15 @@
             </form>
             {% if current_user.is_authenticated %}
                 <div class="dropdown text-end">
-                    <a href="{{ url_for('user', username=current_user.username) }}" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="" alt="mdo" width="32" height="32" class="rounded-circle">
+                    <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="{{ url_for('static', filename='images/avatars/') }}{{ current_user.avatar }}" alt="автарка" width="32" height="32" class="rounded-circle">
                     </a>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownUser1">
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownUser1">
                         <li><a class="dropdown-item" href="{{ url_for('user', username=current_user.username) }}">Профіль</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="{{ url_for('user', username=current_user.username) }}">Профіль</a></li>
+                        <li><a class="dropdown-item" href="/editformprivate">Змінити приватні дані</a></li>
                         <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/editform">Змінити публічні дані</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="/logout">Вийти</a></li>
                     </ul>

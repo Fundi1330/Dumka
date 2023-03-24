@@ -52,9 +52,6 @@ h1, h2, h3, h4, h5, h6{font-size:inherit;font-weight: 400;}
 label {
 	margin: 0.5rem;
 }
-.tag {
-	width: max-content;
-}
 .tags__title {
 	width: fit-content;
 }
@@ -104,4 +101,14 @@ label {
     border-top: .0625rem solid #eee;
     border-bottom: .0625rem solid #eee;
     border-radius: .1875rem;
+}
+.user-data {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 30%;
+    border: #72ee72 solid .125rem;
+    border-radius: 1%;
+    height: fit-content;
+    padding: 1.25rem;
+    text-align: center;
 }

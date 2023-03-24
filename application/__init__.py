@@ -1,9 +1,8 @@
 from flask import Flask, render_template, flash, redirect, url_for, request
-from .forms import Registration, Login
 from flask_login import current_user, LoginManager, login_user, logout_user
 from .models import User, Post, Community, db
 from flask_migrate import Migrate
-from .forms import Posts as PostForm
+from .forms import Posts as PostForm, EditForm, EditFormPrivat, Registration, Login
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.contrib.fileadmin import FileAdmin
@@ -120,6 +119,28 @@ def faq():
 @app.route('/about_us')
 def about_us():
     return render_template('footer/about_us.html', title="About us")
+
+@app.route('/editform', methods=['GET', 'POST'])
+def edit_form():
+    user = User.query.filter_by(id=current_user.id).first()
+    form = EditForm()
+    if form.validate_on_submit():
+        user.name = form.name.data
+        user.about_me = form.about_me.data
+        db.session.commit()
+        return redirect(url_for('user', username=current_user.username))
+    return render_template('users/edit_profile.html', title='Зміна данних', form=form)
+
+@app.route('/editformprivate', methods=['GET', 'POST'])
+def edit_form_privat():
+    user = User.query.filter_by(id=current_user.id).first()
+    form = EditFormPrivat()
+    if form.validate_on_submit():
+        user.username = form.username.data
+        user.password_hash = user.set_password(form.password.data)
+        user.email = form.email.data
+        db.session.commit()
+    return render_template('users/edit_private_data.html', title='Зміна особистих данних', form=form)
 
 admin.add_view(FileAdmin(path, '/static/', name='files'))
 admin.add_view(ModelView(User, db.session, name='Користувачі'))
