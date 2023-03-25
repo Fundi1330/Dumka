@@ -182,18 +182,33 @@ def edit_form_privat():
         return redirect(url_for('user', username=current_user.username))
     return render_template('users/edit_private_data.html', title='Зміна особистих данних', form=form_EFP)
 
-@app.route('/search', methods=['POST'])
+@app.route('/search', methods=['POST', 'GET'])
 def search():
     form = Search()
-    posts = Post.query
     text_theme = []
+    text_theme2 = []
     if form.validate_on_submit():
-        text = posts.filter(Post.text.like('%' + post.searched + '%'))
-        theme = posts.filter(Post.theme.like('%' + post.searched + '%'))
-        text_theme.append(text)
-        text_theme.append(theme)
+        text = Post.query.filter(Post.text.match('%' + form.search_field.data + '%')).all()
+        theme = Post.query.filter(Post.theme.match('%' + form.search_field.data + '%')).all()
+        if text != []:
+            text_theme.append(text)
+        if theme != []:
+            text_theme.append(theme)
+        if text_theme == [[], []]:
+            flash('За вашим запитом нічого не зднайдено', 'error')
 
-    return render_template('search.html', form=form, title='Пошук', searched=post.searched, posts=posts, text_theme=text_theme)
+        for i in text_theme[0]:
+            text_theme2.append(i)
+
+        for i in text_theme[1]:
+            text_theme2.append(i)
+
+        set(text_theme2)
+        list(text_theme2)
+
+
+
+    return render_template('search.html', form=form, title='Пошук', text_theme=text_theme2)
 
 
 @app.route('/addcommunity', methods=['GET', 'POST'])
