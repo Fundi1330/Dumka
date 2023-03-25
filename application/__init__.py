@@ -2,7 +2,9 @@ from flask import Flask, render_template, flash, redirect, url_for, request, abo
 from flask_login import current_user, LoginManager, login_user, logout_user
 from .models import User, Post, Community, db, Comment
 from flask_migrate import Migrate
-from .forms import Posts as PostForm, EditForm, EditFormPrivat, Registration, Login
+from .forms import EditForm, EditFormPrivat, Registration, Login, Search
+from .forms import Community as Cm
+from .forms import Posts as PostForm
 from .forms import Comment as CommentForm
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
@@ -179,6 +181,29 @@ def edit_form_privat():
         db.session.commit()
         return redirect(url_for('user', username=current_user.username))
     return render_template('users/edit_private_data.html', title='Зміна особистих данних', form=form_EFP)
+
+@app.route('/search', methods=['POST'])
+def search():
+    form = Search()
+    posts = Post.query
+    text_theme = []
+    if form.validate_on_submit():
+        text = posts.filter(Post.text.like('%' + post.searched + '%'))
+        theme = posts.filter(Post.theme.like('%' + post.searched + '%'))
+        text_theme.append(text)
+        text_theme.append(theme)
+
+    return render_template('search.html', form=form, title='Пошук', searched=post.searched, posts=posts, text_theme=text_theme)
+
+
+@app.route('/addcommunity', methods=['GET', 'POST'])
+def add_community():
+    form = Cm()
+    if form.validate_on_submit():
+        coommunity = Cm(name=form.name.data, description=form.description.data, themes=form.tema.data)
+        db.session.add(coommunity)
+        db.session.commit()
+
 
 admin.add_view(FileAdmin(path, '/static/', name='files'))
 admin.add_view(ModelView(User, db.session, name='Користувачі'))
