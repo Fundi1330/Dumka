@@ -48,3 +48,16 @@ class Posts(FlaskForm):  # Треба бд для додавання пості�
 class Comment(FlaskForm):
     comets = TextAreaField('Коментувати', validators=[Length(min=0, max=800, message='За над то багато символив'), DataRequired('Не може бути пусте')])
     submit = SubmitField('Підтвердити')
+
+class Search(FlaskForm):
+    search_field = StringField('Пошук', validators=[Length(min=0, max=400, message='За над то багато символив'),
+                                              DataRequired('Не може бути пусте')])
+    submit = SubmitField('Пошук!')
+
+class Community(FlaskForm):
+    name = TextAreaField('Користувач', validators=[DataRequired('Не може бути пусте')])
+    tema = TextAreaField('Тема', validators=[Length(min=0, max=400, message='За над то багато символив'),
+                                             DataRequired('Не може бути пусте')])
+    description = TextAreaField('Опис', validators=[Length(min=0, max=500, message='За над то багато символив'),
+                                           DataRequired('Не може бути пусте')])
+    submit = SubmitField('Підтвердити')

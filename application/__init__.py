@@ -2,8 +2,9 @@ from flask import Flask, render_template, flash, redirect, url_for, request, abo
 from flask_login import current_user, LoginManager, login_user, logout_user
 from .models import User, Post, Community, db, Comment
 from flask_migrate import Migrate
-from .forms import Posts as PostForm, EditForm, EditFormPrivat, Registration, Login
+from .forms import Posts as PostForm, EditForm, EditFormPrivat, Registration, Login, Search
 from .forms import Comment as CommentForm
+from .forms import Community as CommunityForm
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.contrib.fileadmin import FileAdmin
@@ -17,7 +18,8 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'StandWithUkraine'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:12345678990@localhost:5432/alya_redit'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config['CKEDITOR_PKG_TYPE'] = 'basic'
+app.config['CKEDITOR_PKG_TYPE'] = 'standard'
+app.config['CKEDITOR_ENABLE_CODESNIPPET'] = True
 ckeditor = CKEditor(app)
 path = op.join(op.dirname(__file__), 'static')
 
@@ -44,8 +46,14 @@ def logout():
 @app.route('/index/', methods=['GET', 'POST'])
 def main():
     posts = Post.query.order_by(desc(Post.date_of_publication)).all()
-    recomended_communities = Community.query.all()
+    communities = Community.query.all()
+    recomended_communities = []
     form = PostForm()
+    if current_user.is_authenticated:
+        for i in communities:
+            for a in i.themes:
+                if a in current_user.interests and i not in recomended_communities and len(recomended_communities) != 5:
+                    recomended_communities.append(i)
     if form.validate_on_submit() and current_user.is_authenticated:
         tags = findall('[a-z]{1,}|[а-їґ]{1,}', form.tag.data.lower())
         post = Post(theme=form.title.data, tags=tags, users=current_user, text=form.posts.data, likes=0, date_of_publication=datetime.datetime.now(), comments=[])
@@ -179,6 +187,41 @@ def edit_form_privat():
         db.session.commit()
         return redirect(url_for('user', username=current_user.username))
     return render_template('users/edit_private_data.html', title='Зміна особистих данних', form=form_EFP)
+
+@app.route('/search', methods=['POST', 'GET'])
+def search():
+    form = Search()
+    text_theme2 = []
+    if form.validate_on_submit():
+        text = Post.query.filter(Post.text.match('%' + form.search_field.data + '%')).all()
+        theme = Post.query.filter(Post.theme.match('%' + form.search_field.data + '%')).all()
+        if text != []:
+            for i in text:
+                text_theme2.append(i)
+        if theme != []:
+            for i in theme:
+                if i not in text_theme2:
+                    text_theme2.append(i)
+
+        if text_theme2 == []:
+            flash('За вашим запитом нічого не зднайдено', 'error')
+
+        flash(text_theme2, 'succes')
+        flash(theme, 'succes')
+        flash(text, 'succes')
+
+
+
+    return render_template('search.html', form=form, title='Пошук', text_theme=text_theme2)
+
+
+@app.route('/addcommunity', methods=['GET', 'POST'])
+def add_community():
+    form = CommunityForm()
+    if form.validate_on_submit():
+        coommunity = CommunityForm(name=form.name.data, description=form.description.data, themes=form.tema.data)
+        db.session.add(coommunity)
+        db.session.commit()
 
 admin.add_view(FileAdmin(path, '/static/', name='files'))
 admin.add_view(ModelView(User, db.session, name='Користувачі'))

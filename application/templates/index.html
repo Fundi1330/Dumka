@@ -20,17 +20,21 @@
                 <p style="color: red;">[{{error}}]</p>
             {% endfor %}
             {{ form.submit(class_='btn btn-primary m-2')}}
-            {{ ckeditor.load() }}
+            {{ ckeditor.load(pkg_type="basic") }}
             {{ ckeditor.config(name='posts') }}
         </form>
     </section>
     <section class="recomended">
         <h2>Рекомендовані спільноти:</h2>
-        {% for community in recomended_communities %}
-            <div class="border border-info rounded p-3 my-3">
-                <h2 class="recomended__item">{{ community.name }}</h2>
-            </div>
-        {% endfor %}
+        {% if current_user.is_authenticated %}
+            {% for community in recomended_communities %}
+                <div class="border border-info rounded p-3 my-3">
+                    <h2 class="recomended__item">{{ community.name }}</h2>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Щоб ми рекомендували вам ком'юніті, ви маєте бути зареєстровані!</p>
+        {% endif %}
     </section>
     <section class="posts">
         <h2>Пости:</h2>

@@ -47,9 +47,11 @@ class Community(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, index=True)
     description = db.Column(db.String(300), index=True)
+    themes = db.Column(ARRAY(db.String))
 
     def __repr__(self) -> str:
         return '<Community{}'.format(self.name)
+    
 class Comment(db.Model):
     __tablename__ = 'Comment'
     id = db.Column(db.Integer, primary_key=True)
