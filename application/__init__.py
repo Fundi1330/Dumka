@@ -191,21 +191,15 @@ def search():
         text = Post.query.filter(Post.text.match('%' + form.search_field.data + '%')).all()
         theme = Post.query.filter(Post.theme.match('%' + form.search_field.data + '%')).all()
         if text != []:
-            text_theme.append(text)
+            for i in text:
+                text_theme2.append(i)
         if theme != []:
-            text_theme.append(theme)
-        if text_theme == [[], []]:
+            for i in theme:
+                if i not in text_theme2:
+                    text_theme2.append(i)
+
+        if text_theme == []:
             flash('За вашим запитом нічого не зднайдено', 'error')
-
-        for i in text_theme[0]:
-            text_theme2.append(i)
-
-        for i in text_theme[1]:
-            text_theme2.append(i)
-
-        set(text_theme2)
-        list(text_theme2)
-
 
 
     return render_template('search.html', form=form, title='Пошук', text_theme=text_theme2)
