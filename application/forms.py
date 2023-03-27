@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, FileField
 from wtforms.validators import DataRequired, Email
 from wtforms.validators import Length
+from flask_ckeditor import CKEditorField
 
 
 class Registration(FlaskForm):  # Для реєстрації, треба html
@@ -25,7 +26,7 @@ class EditForm(FlaskForm):  # Для того щоб миняти імя и тд
     # бд
 
     name = StringField('Користувач', validators=[DataRequired('Не може бути пусте')])
-    about_me = TextAreaField('Про мене', validators=[Length(min=0, max=500, message='За над то багато символив')])
+    about_me = CKEditorField('Про мене', validators=[Length(min=0, max=500, message='За над то багато символив')])
     submit = SubmitField('Підтвердити')  # Кнопка
     avatar = FileField('!')  # ! == Назва файла
 
@@ -63,12 +64,12 @@ class Search(FlaskForm):
 
 
 class Community(FlaskForm):
-    name = TextAreaField('Користувач', validators=[DataRequired('Не може бути пусте')])
+    name = TextAreaField('Назва Комюніті', validators=[Length(min=0, max=400, message='За над то багато символив'),
+                                                       DataRequired('Не може бути пусте')])
     tema = TextAreaField('Тема', validators=[Length(min=0, max=400, message='За над то багато символив'),
                                              DataRequired('Не може бути пусте')])
-    description = TextAreaField('Опис', validators=[Length(min=0, max=500, message='За над то багато символив'),
-                                           DataRequired('Не може бути пусте')])
+    description = CKEditorField('Опис', validators=[Length(min=0, max=500, message='За над то багато символив'),
+                                                    DataRequired('Не може бути пусте')])
     photo = FileField('!')  # ! == Назва файла
 
     submit = SubmitField('Підтвердити')
-
