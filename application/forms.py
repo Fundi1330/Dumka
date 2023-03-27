@@ -68,14 +68,7 @@ class Community(FlaskForm):
                                              DataRequired('Не може бути пусте')])
     description = TextAreaField('Опис', validators=[Length(min=0, max=500, message='За над то багато символив'),
                                            DataRequired('Не може бути пусте')])
-    submit = SubmitField('Підтвердити')
+    photo = FileField('!')  # ! == Назва файла
 
-
-class EditCommunity(FlaskForm):
-    name = TextAreaField('Користувач', validators=[DataRequired('Не може бути пусте')])
-    tema = TextAreaField('Тема', validators=[Length(min=0, max=400, message='За над то багато символив'),
-                                             DataRequired('Не може бути пусте')])
-    description = TextAreaField('Опис', validators=[Length(min=0, max=500, message='За над то багато символив'),
-                                           DataRequired('Не може бути пусте')])
     submit = SubmitField('Підтвердити')
 
