@@ -1,9 +1,9 @@
 from flask import Flask, render_template, flash, redirect, url_for, request, abort
 from flask_login import current_user, LoginManager, login_user, logout_user
-from .models import User, Post, Community, db, Comment
+from .models import User, Post, Community, db, Comment, Users, Roles
 from flask_migrate import Migrate
 from .forms import EditForm, EditFormPrivat, Registration, Login, Search
-from .forms import Community as Cm
+from .forms import Community as CommunityForm
 from .forms import Posts as PostForm
 from .forms import Comment as CommentForm
 from flask_admin import Admin
@@ -14,6 +14,8 @@ import datetime
 from re import findall
 from sqlalchemy import desc
 from flask_ckeditor import CKEditor
+from flask_security import Security, SQLAlchemyUserDatastore
+from flask_security import current_user as cur_us
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'StandWithUkraine'
@@ -28,11 +30,23 @@ migrate = Migrate(app, db)
 
 login = LoginManager(app)
 
-admin = Admin(app, "OP", url='/admin')       #поки без паролю
+admin = Admin(app, "OP", url='/admin') #поки без паролю
+
+user_datastore = SQLAlchemyUserDatastore(db, Users, Roles)
+security = Security(app, user_datastore)
+
 
 
 with app.app_context():
-    db.create_all()
+    first_user = user_datastore.create_user(username='admin',email='test@gmail.com', password='adminovich')
+    user_datastore.toggle_active(first_user)
+    db.session.commit()
+
+class UserModelView(ModelView):
+  def is_accessible(self):
+    return (cur_us.is_active and
+            cur_us.is_authenticated)
+
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
@@ -96,9 +110,6 @@ def user(username):
     posts = Post.query.filter_by(author=username).order_by(desc(Post.date_of_publication)).all()
     return render_template('users/profile.html', title=username, user=user, posts=posts)
 
-@app.route('/kind/<subreddit>') #Сабреддіт
-def kind(subreddit):
-    return render_template('kind.html', title='Сабреддіт')
 
 @app.route('/editpost/<int:id>', methods=['GET', 'POST'])
 def edit_post(id):
@@ -207,12 +218,42 @@ def search():
 
 @app.route('/addcommunity', methods=['GET', 'POST'])
 def add_community():
-    form = Cm()
+    form = CommunityForm()
     if form.validate_on_submit():
-        coommunity = Cm(name=form.name.data, description=form.description.data, themes=form.tema.data)
+        coommunity = Community(name=form.name.data, description=form.description.data, themes=form.tema.data)
         db.session.add(coommunity)
         db.session.commit()
 
+    return render_template('communities/add_community', title='''Додавання ком'юніті''', form=form)
+
+
+@app.route('/editcommunity/<int:id>', methods=['GET', 'POST'])
+def edit_community(id):
+    community = Community.query.filter_by(id=id).first()
+    form = CommunityForm()
+    if current_user.username != post.author:
+        abort(404)
+
+    if request.method == 'GET':
+        form.name.data = community.name
+        form.tema.data = community.themes
+        form.description.data = community.description
+
+    if form.validate_on_submit():
+        community.name = form.name.data
+        community.description = form.description.data
+        community.themes = form.tema.data
+
+    return render_template('communities/edit_community', title='''Зміна вашого ком'юніті''', form=form)
+
+@app.route('/community/<com>') #Сабреддіт
+def kind(com):
+    return render_template('kind.html', title='Сабреддіт')
+
 
 admin.add_view(FileAdmin(path, '/static/', name='files'))
-admin.add_view(ModelView(User, db.session, name='Користувачі'))
+admin.add_view(UserModelView(User, db.session, name='Користувачі'))
+admin.add_view(UserModelView(Community, db.session, name='''Ком'юніті'''))
+admin.add_view(UserModelView(Roles, db.session, name='Ролі'))
+admin.add_view(UserModelView(Comment, db.session, name='Коменти'))
+admin.add_view(UserModelView(Post, db.session, name='Пости'))
