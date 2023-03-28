@@ -16,14 +16,20 @@ from sqlalchemy import desc
 from flask_ckeditor import CKEditor
 from flask_security import Security, SQLAlchemyUserDatastore
 from flask_security import current_user as cur_us
+from flask_uploads import UploadSet, IMAGES, configure_uploads
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'StandWithUkraine'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:12345678990@localhost:5432/alya_redit'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config['CKEDITOR_PKG_TYPE'] = 'basic'
+app.config['UPLOADED_FILES_DEST'] = '\\static\\images\\avatars'
 ckeditor = CKEditor(app)
 path = op.join(op.dirname(__file__), 'static')
+
+photos = UploadSet('photos', IMAGES)
+configure_uploads(app, (photos))
+configure_uploads(app, photos)
 
 db.init_app(app)
 migrate = Migrate(app, db)
@@ -104,11 +110,28 @@ def login():
 def public():
     return render_template('public.html', title='Публікуй свій реддіт')
 
-@app.route('/user/<username>') #декоратор для перегляду профілю
+@app.route('/user/<username>', methods=['GET', 'POST']) #декоратор для перегляду профілю
 def user(username):
     user = User.query.filter_by(username=username).first()
     posts = Post.query.filter_by(author=username).order_by(desc(Post.date_of_publication)).all()
-    return render_template('users/profile.html', title=username, user=user, posts=posts)
+    id_user = User.query.filter_by(id=current_user.id).first()
+    photo = User.load(id_user)
+    if photo is None:
+        abort(404)
+    url = photos.url(photo.filename)
+    return render_template('users/profile.html', title=username, user=user, posts=posts, url=url)
+
+@app.route('/upload', methods=['GET', 'POST'])
+def upload():
+    form = EditForm()
+    id_user = current_user.id
+    if request.method == 'POST' and form.validate_on_submit():
+        rec = User(avatar=form.avatar.data, username=g.user.id)
+        db.session.add(rec)
+        db.session.commit()
+        flash("Photo saved.")
+        return redirect(url_for('show', id=rec.id))
+    return render_template('upload.html', title='Додайте свою аватарку!', form=form)
 
 
 @app.route('/editpost/<int:id>', methods=['GET', 'POST'])
