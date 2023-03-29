@@ -108,7 +108,8 @@ def login():
 
 @app.route('/public') #публікація
 def public():
-    return render_template('public.html', title='Публікуй свій реддіт')
+    fornm = Search()
+    return render_template('public.html', title='Публікуй свій реддіт', form = form)
 
 @app.route('/user/<username>', methods=['GET', 'POST']) #декоратор для перегляду профілю
 def user(username):
@@ -180,11 +181,13 @@ def post(id):
 
 @app.route('/faq')
 def faq():
-    return render_template('footer/faq.html', title='Faq')
+    form = Search()
+    return render_template('footer/faq.html', title='Faq', form=form)
 
 @app.route('/about_us')
 def about_us():
-    return render_template('footer/about_us.html', title="About us")
+    form = Search()
+    return render_template('footer/about_us.html', title="About us", form=form)
 
 @app.route('/editform', methods=['GET', 'POST'])
 def edit_form():
@@ -271,7 +274,8 @@ def edit_community(id):
 
 @app.route('/community/<com>') #Сабреддіт
 def kind(com):
-    return render_template('kind.html', title='Сабреддіт')
+    form = Search()
+    return render_template('kind.html', title='Сабреддіт', form=form)
 
 
 admin.add_view(FileAdmin(path, '/static/', name='files'))
