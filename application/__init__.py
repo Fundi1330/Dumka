@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flash, redirect, url_for, request, abort
+from flask import Flask, render_template, flash, redirect, url_for, request, abort, g
 from flask_login import current_user, LoginManager, login_user, logout_user
 from .models import User, Post, Community, db, Comment, Users, Roles
 from flask_migrate import Migrate
@@ -125,7 +125,7 @@ def user(username):
 def upload():
     form = EditForm()
     id_user = current_user.id
-    if request.method == 'POST' and form.validate_on_submit():
+    if request.method == 'POST' and 'photo' in request.files:
         rec = User(avatar=form.avatar.data, username=g.user.id)
         db.session.add(rec)
         db.session.commit()
