@@ -35,9 +35,8 @@ class Post(db.Model):
     tags = db.Column(ARRAY(db.String), nullable=False)
     author = db.Column(db.String, db.ForeignKey('user.id'), nullable=False)
     likes = db.Column(db.Integer, index=True, nullable=False)
-    comments = db.relationship('Comment', backref='comment', lazy='dynamic', nullable=False)
-    community = db.relationship('Community', backref='community', lazy='dynamic', nullable=False)
-
+    comments = db.relationship('Comment', backref='comment', lazy='dynamic')
+    posts = db.Column(db.Integer, db.ForeignKey('community.id'))
 
     def __repr__(self) -> str:
         return '<Post {}'.format(self.author)
@@ -49,7 +48,7 @@ class Community(db.Model):
     name = db.Column(db.String, index=True, nullable=False)
     description = db.Column(db.String(300), index=True, nullable=False)
     themes = db.Column(ARRAY(db.String), nullable=False)
-    post = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
+    community = db.relationship('Post', backref='community', lazy='dynamic')
 
     def __repr__(self) -> str:
         return '<Community{}'.format(self.name)
@@ -65,7 +64,13 @@ class Comment(db.Model):
     def __repr__(self) -> str:
         return '<Comment{}'.format(self.author)
 
-user_roles = db.table("user_roles",
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
-    db.Column('role_id', db.Integer, db.ForeignKey('role.id'))
+class Role(db.Model):
+    __tablename__ = 'Role'
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    name = db.Column(db.String, index=True, nullable=False)
+    description = db.Column(db.String, index=True, nullable=False)
+
+User_roles = db.table("User_roles",
+    db.Column('user_id', db.Integer, db.ForeignKey('User.id')),
+    db.Column('role_id', db.Integer, db.ForeignKey('Role.id'))
 )
