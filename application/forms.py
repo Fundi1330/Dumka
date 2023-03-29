@@ -37,6 +37,8 @@ class EditFormPrivat(FlaskForm):  # Теж треба бд
     username = StringField('Користувач', validators=[DataRequired('Не може бути пусте')])
     password = PasswordField('Пароль', validators=[DataRequired('Не може бути пусте')])
     email = StringField('Почта', validators=[DataRequired('Не може бути пусте'), Email(message='Email не існує')])
+    recomendation = StringField('Вам подобаеться',
+                                validators=[DataRequired('Наприклад: Футбол, Програмування, Мйнкрафт...')])
     submit = SubmitField('Підтвердити')  # Кнопка
 
 
