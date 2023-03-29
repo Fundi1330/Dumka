@@ -1,6 +1,6 @@
 from flask import Flask, render_template, flash, redirect, url_for, request, abort
 from flask_login import current_user, LoginManager, login_user, logout_user
-from .models import User, Post, Community, db, Comment
+from .models import User, Post, Community, db, Comment, Roles
 from flask_migrate import Migrate
 from .forms import Posts as PostForm, EditForm, EditFormPrivat, Registration, Login, Search
 from .forms import Comment as CommentForm
@@ -13,6 +13,8 @@ import datetime
 from re import findall
 from sqlalchemy import desc
 from flask_ckeditor import CKEditor
+from flask_security import login_required, current_user, Security, SQLAlchemyUserDatastore
+from flask_security.utils import encrypt_password
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'StandWithUkraine'
@@ -20,6 +22,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:12345678990@local
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config['CKEDITOR_PKG_TYPE'] = 'standard'
 app.config['CKEDITOR_ENABLE_CODESNIPPET'] = True
+app.config['SECURITY_PASSWORD_HASH'] = 'pbkdf2_sha512'
+app.config['SECURITY_PASSWORD_SALT'] = 'admin_password'
+
 ckeditor = CKEditor(app)
 path = op.join(op.dirname(__file__), 'static')
 
@@ -30,9 +35,10 @@ login = LoginManager(app)
 
 admin = Admin(app, "OP", url='/admin')       #поки без паролю
 
+user_datastore = SQLAlchemyUserDatastore(db, User, Roles)
+security = Security(app, user_datastore)
 
-with app.app_context():
-    db.create_all()
+
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
@@ -102,9 +108,9 @@ def user(username):
     posts = Post.query.filter_by(author=username).order_by(desc(Post.date_of_publication)).all()
     return render_template('users/profile.html', title=username, user=user, posts=posts)
 
-@app.route('/kind/<subreddit>') #Сабреддіт
-def kind(subreddit):
-    return render_template('kind.html', title='Сабреддіт')
+# @app.route('/kind/<subreddit>') #Сабреддіт
+# def kind(subreddit):
+#     return render_template('kind.html', title='Сабреддіт')
 
 @app.route('/editpost/<int:id>', methods=['GET', 'POST'])
 def edit_post(id):
@@ -219,9 +225,56 @@ def search():
 def add_community():
     form = CommunityForm()
     if form.validate_on_submit():
-        coommunity = CommunityForm(name=form.name.data, description=form.description.data, themes=form.tema.data)
-        db.session.add(coommunity)
+        community = CommunityForm(name=form.name.data, description=form.description.data, themes=form.tema.data)
+        db.session.add(community)
         db.session.commit()
 
+@app.route('/editcommunity/<int:id>', methods=['GET', 'POST'])
+def edit_community(id):
+    community = Community.query.filter_by(id=id).first()
+    form = CommunityForm()
+    if current_user.username != post.author:
+        abort(404)
+
+    if request.method == 'GET':
+        form.name.data = community.name
+        form.tema.data = community.themes
+        form.description.data = community.description
+
+    if form.validate_on_submit():
+        community.name = form.name.data
+        community.description = form.description.data
+        community.themes = form.tema.data
+
+    return render_template('communities/edit_community', title='''Зміна вашого ком'юніті''', form=form)
+
+# with app.app_context():
+#     db.create_all()
+#     user_datastore.find_or_create_role(name='admin', description='Administrator')
+#     user_datastore.find_or_create_role(name='user', description='Regular user')
+
+#     encrypted_password = encrypt_password('admin_dumka') # replace password
+#     if not user_datastore.get_user('admin@dumka.com'):
+#         user_datastore.create_user(email='admin@dumka.com', password_hash=encrypted_password, username='admin')
+
+#     db.session.commit()
+
+#     user_datastore.add_role_to_user('admin@dumka.com', 'admin')
+#     db.session.commit()
+
+# @app.route('/community/<com>') #Сабреддіт
+# def kind(com):
+#     return render_template('kind.html', title='Сабреддіт')
+
+class UserModelView(ModelView):
+  def is_accessible(self):
+    return (current_user.is_active and
+            current_user.is_authenticated)
+
 admin.add_view(FileAdmin(path, '/static/', name='files'))
-admin.add_view(ModelView(User, db.session, name='Користувачі'))
+admin.add_view(UserModelView(User, db.session, name='Користувачі'))
+admin.add_view(UserModelView(Community, db.session, name='''Ком'юніті'''))
+admin.add_view(UserModelView(Roles, db.session, name='Ролі'))
+admin.add_view(UserModelView(Comment, db.session, name='Коменти'))
+admin.add_view(UserModelView(Post, db.session, name='Пости'))
+

@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, FileField
 from wtforms.validators import DataRequired, Email
 from wtforms.validators import Length
 from hashlib import md5
@@ -18,13 +18,14 @@ class Login(FlaskForm):  # Для входу, треба html
     username = StringField('Користувач', validators=[DataRequired('Не може бути пусте')])
     password = PasswordField('Пароль', validators=[DataRequired('Не може бути пусте')])
     submit = SubmitField('Підтвердити')
-    remember_me = BooleanField('Запамятай мене!')
+    remember_me = BooleanField('Запамятай менеАватарка')
 
 class EditForm(FlaskForm):  # Для того щоб миняти імя и тд треба бд
     # бд
 
     name = StringField("Ім'я", validators=[DataRequired('Не може бути пусте')])
-    about_me = TextAreaField('Про мене', validators=[Length(min=0, max=500, message='За над то багато символив')])
+    about_me = CKEditorField('Про мене', validators=[Length(min=0, max=500, message='За над то багато символив')])
+    avatar = FileField('Аватарка')  # Аватарка == Назва файла
     submit = SubmitField('Підтвердити')  # Кнопка
 
     def avatar(self, size):
@@ -60,4 +61,6 @@ class Community(FlaskForm):
                                              DataRequired('Не може бути пусте')])
     description = TextAreaField('Опис', validators=[Length(min=0, max=500, message='За над то багато символив'),
                                            DataRequired('Не може бути пусте')])
+    photo = FileField('Аватарка')  # Аватарка == Назва файла
+
     submit = SubmitField('Підтвердити')

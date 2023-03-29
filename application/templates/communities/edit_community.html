@@ -8,12 +8,14 @@
         {% for error in form.name.errors %}
             <p style="color: red;">[{{error}}]</p>
         {% endfor %}
-        {{ form.about_me.label }}
-        {{ form.about_me(class_='form-control') }}
-        {% for error in form.about_me.errors %}
+        {{ form.description.label }}
+        {{ form.description(class_='form-control')}}
+        {% for error in form.description.errors %}
             <p style="color: red;">[{{error}}]</p>
         {% endfor %}
-        {{ form.submit(class_='form-control my-3 col-sm-3') }}
+        {{ form.tema.label }}
+        {{ form.tema(class_='form-control') }}
+        {{ form.submit(class_='form-control') }}
     </form>
 </div>
 {% endblock %}
