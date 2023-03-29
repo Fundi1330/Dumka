@@ -1,11 +1,12 @@
 from flask import Flask, render_template, flash, redirect, url_for, request, abort
-from flask_login import current_user, LoginManager, login_user, logout_user
+from flask_login import LoginManager, login_user, logout_user
 from .models import User, Post, Community, db, Comment, Roles
 from flask_migrate import Migrate
-from .forms import Posts as PostForm, EditForm, EditFormPrivat, Registration, Login, Search
+from .forms import Posts as PostForm
+from .forms import EditForm, EditFormPrivat, Registration, LoginForm, Search
 from .forms import Comment as CommentForm
 from .forms import Community as CommunityForm
-from flask_admin import Admin
+from flask_admin import Admin, helpers
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.contrib.fileadmin import FileAdmin
 import os.path as op
@@ -13,7 +14,7 @@ import datetime
 from re import findall
 from sqlalchemy import desc
 from flask_ckeditor import CKEditor
-from flask_security import login_required, current_user, Security, SQLAlchemyUserDatastore
+from flask_security import current_user, Security, SQLAlchemyUserDatastore
 from flask_security.utils import encrypt_password
 
 app = Flask(__name__)
@@ -88,7 +89,8 @@ def signup():
 def login():
     if current_user.is_authenticated:
        return redirect('index')
-    form = Login()
+    form = LoginForm()
+    flash('test', 'error')
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
@@ -158,7 +160,8 @@ def post(id):
 
 @app.route('/faq')
 def faq():
-    return render_template('footer/faq.html', title='Faq')
+    form = Search()
+    return render_template('footer/faq.html', title='Faq', form=form)
 
 @app.route('/about_us')
 def about_us():
@@ -229,6 +232,8 @@ def add_community():
         db.session.add(community)
         db.session.commit()
 
+    return render_template('communities/add_community', title='''Додавання ком'юніті''', form=form)
+
 @app.route('/editcommunity/<int:id>', methods=['GET', 'POST'])
 def edit_community(id):
     community = Community.query.filter_by(id=id).first()
@@ -260,11 +265,23 @@ def edit_community(id):
 #     db.session.commit()
 
 #     user_datastore.add_role_to_user('admin@dumka.com', 'admin')
+
+    
+
 #     db.session.commit()
 
-# @app.route('/community/<com>') #Сабреддіт
-# def kind(com):
-#     return render_template('kind.html', title='Сабреддіт')
+
+@security.context_processor
+def security_context_processor():
+    return dict(
+        admin_base_template=admin.base_template,
+        admin_view=admin.index_view,
+        h=helpers,
+)
+
+@app.route('/community/<com>') #Сабреддіт
+def kind(com):
+    return render_template('kind.html', title='Сабреддіт')
 
 class UserModelView(ModelView):
   def is_accessible(self):
