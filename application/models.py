@@ -70,7 +70,10 @@ class Role(db.Model):
     name = db.Column(db.String, index=True, nullable=False)
     description = db.Column(db.String, index=True, nullable=False)
 
-User_roles = db.table("User_roles",
+    def __repr__(self) -> str:
+        return f'Role {self.name}'
+
+user_roles = db.table("user_roles",
     db.Column('user_id', db.Integer, db.ForeignKey('User.id')),
     db.Column('role_id', db.Integer, db.ForeignKey('Role.id'))
 )
