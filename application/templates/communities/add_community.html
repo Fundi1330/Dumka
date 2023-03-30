@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="form text-center row justify-content-center">
+    <form action="" method="post" class="col-6 p-2 justify-content-center form-inline" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        {{ form.name.label }}
+        {{ form.name(class_='form-control') }}
+        {% for error in form.name.errors %}
+            <p style="color: red;">[{{error}}]</p>
+        {% endfor %}
+        {{ form.description.label }}
+        {{ form.description(class_='form-control')}}
+        {% for error in form.description.errors %}
+            <p style="color: red;">[{{error}}]</p>
+        {% endfor %}
+        {{ form.tema.label }}
+        {{ form.tema(class_='form-control') }}
+        {{ form.submit(class_='form-control') }}
+    </form>
+</div>
+{% endblock %}

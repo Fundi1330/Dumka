@@ -1,5 +1,5 @@
 from flask import Flask, render_template, flash, redirect, url_for, request, abort
-from flask_login import LoginManager, login_user, logout_user
+from flask_login import LoginManager, login_user, logout_user, current_user
 from .models import User, Post, Community, db, Comment, Roles
 from flask_migrate import Migrate
 from .forms import Posts as PostForm
@@ -9,12 +9,12 @@ from .forms import Community as CommunityForm
 from flask_admin import Admin, helpers
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.contrib.fileadmin import FileAdmin
-import os.path as op
+from os import path, getcwd
 import datetime
 from re import findall
 from sqlalchemy import desc
 from flask_ckeditor import CKEditor
-from flask_security import current_user, Security, SQLAlchemyUserDatastore
+from flask_security import Security, SQLAlchemyUserDatastore
 from flask_security.utils import encrypt_password
 
 app = Flask(__name__)
@@ -25,9 +25,10 @@ app.config['CKEDITOR_PKG_TYPE'] = 'standard'
 app.config['CKEDITOR_ENABLE_CODESNIPPET'] = True
 app.config['SECURITY_PASSWORD_HASH'] = 'pbkdf2_sha512'
 app.config['SECURITY_PASSWORD_SALT'] = 'admin_password'
+app.config['UPLOADED_PHOTOS_DEST'] = getcwd()
 
 ckeditor = CKEditor(app)
-path = op.join(op.dirname(__file__), 'static')
+path = path.join(path.dirname(__file__), 'static')
 
 db.init_app(app)
 migrate = Migrate(app, db)
@@ -85,12 +86,11 @@ def signup():
         return redirect(url_for('login'))
     return render_template('authorization/register.html', title='Реєстрація', form=form)
 
-@app.route('/login', methods=['GET', 'POST']) #вхід на акк
+@app.route('/log_in', methods=['GET', 'POST']) #вхід на акк
 def login():
     if current_user.is_authenticated:
        return redirect('index')
     form = LoginForm()
-    flash('test', 'error')
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
@@ -100,26 +100,20 @@ def login():
         return redirect('index')
     return render_template('authorization/login.html', title='Вхід', form=form)
 
-@app.route('/public') #публікація
-def public():
-    return render_template('public.html', title='Публікуй свій реддіт')
-
-@app.route('/user/<username>') #декоратор для перегляду профілю
+@app.route('/user/<username>', methods=['GET', 'POST']) #декоратор для перегляду профілю
 def user(username):
+    form = Search()
     user = User.query.filter_by(username=username).first()
     posts = Post.query.filter_by(author=username).order_by(desc(Post.date_of_publication)).all()
-    return render_template('users/profile.html', title=username, user=user, posts=posts)
-
-# @app.route('/kind/<subreddit>') #Сабреддіт
-# def kind(subreddit):
-#     return render_template('kind.html', title='Сабреддіт')
+    
+    return render_template('users/profile.html', title=username, user=user, posts=posts, form=form)
 
 @app.route('/editpost/<int:id>', methods=['GET', 'POST'])
 def edit_post(id):
     form_P = PostForm()
     post = Post.query.filter_by(id=id).first()
     if current_user.username != post.author:
-        abort(404)
+        abort(403)
     if request.method == 'GET':
         form_P.title.data = post.theme
         form_P.posts.data = post.text
@@ -165,7 +159,8 @@ def faq():
 
 @app.route('/about_us')
 def about_us():
-    return render_template('footer/about_us.html', title="About us")
+    form = Search()
+    return render_template('footer/about_us.html', title="About us", form=form)
 
 @app.route('/editform', methods=['GET', 'POST'])
 def edit_form():
@@ -215,11 +210,6 @@ def search():
         if text_theme2 == []:
             flash('За вашим запитом нічого не зднайдено', 'error')
 
-        flash(text_theme2, 'succes')
-        flash(theme, 'succes')
-        flash(text, 'succes')
-
-
 
     return render_template('search.html', form=form, title='Пошук', text_theme=text_theme2)
 
@@ -228,18 +218,19 @@ def search():
 def add_community():
     form = CommunityForm()
     if form.validate_on_submit():
-        community = CommunityForm(name=form.name.data, description=form.description.data, themes=form.tema.data)
+        tags = findall('[a-z]{1,}|[а-їґ]{1,}', form.tema.data.lower())
+        community = Community(name=form.name.data, description=form.description.data, themes=tags)
         db.session.add(community)
         db.session.commit()
 
-    return render_template('communities/add_community', title='''Додавання ком'юніті''', form=form)
+    return render_template('communities/add_community.html', title='''Додавання ком'юніті''', form=form)
 
 @app.route('/editcommunity/<int:id>', methods=['GET', 'POST'])
 def edit_community(id):
     community = Community.query.filter_by(id=id).first()
     form = CommunityForm()
     if current_user.username != post.author:
-        abort(404)
+        abort(403)
 
     if request.method == 'GET':
         form.name.data = community.name
@@ -251,24 +242,22 @@ def edit_community(id):
         community.description = form.description.data
         community.themes = form.tema.data
 
-    return render_template('communities/edit_community', title='''Зміна вашого ком'юніті''', form=form)
+    return render_template('communities/edit_community.html', title='''Зміна вашого ком'юніті''', form=form)
 
-# with app.app_context():
-#     db.create_all()
-#     user_datastore.find_or_create_role(name='admin', description='Administrator')
-#     user_datastore.find_or_create_role(name='user', description='Regular user')
+with app.app_context():
+    db.create_all()
+    user_datastore.find_or_create_role(name='admin', description='Administrator')
+    user_datastore.find_or_create_role(name='user', description='Regular user')
 
-#     encrypted_password = encrypt_password('admin_dumka') # replace password
-#     if not user_datastore.get_user('admin@dumka.com'):
-#         user_datastore.create_user(email='admin@dumka.com', password_hash=encrypted_password, username='admin')
+    encrypted_password = encrypt_password('admin_dumka') # replace password
+    if not user_datastore.get_user('admin@dumka.com'):
+        user_datastore.create_user(email='admin@dumka.com', password_hash=encrypted_password, username='admin')
 
-#     db.session.commit()
+    db.session.commit()
 
-#     user_datastore.add_role_to_user('admin@dumka.com', 'admin')
+    user_datastore.add_role_to_user('admin@dumka.com', 'admin')
 
-    
-
-#     db.session.commit()
+    db.session.commit()
 
 
 @security.context_processor
@@ -281,7 +270,8 @@ def security_context_processor():
 
 @app.route('/community/<com>') #Сабреддіт
 def kind(com):
-    return render_template('kind.html', title='Сабреддіт')
+    form = Search()
+    return render_template('kind.html', title='Сабреддіт', form=form)
 
 class UserModelView(ModelView):
   def is_accessible(self):

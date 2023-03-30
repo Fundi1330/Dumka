@@ -1,8 +1,9 @@
 from flask_sqlalchemy import SQLAlchemy
-from flask_security import UserMixin, RoleMixin
+from flask_security import RoleMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.dialects.postgresql import ARRAY
 from datetime import datetime
+from flask_login import UserMixin
 
 db = SQLAlchemy()
 

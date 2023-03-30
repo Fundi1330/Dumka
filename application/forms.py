@@ -36,6 +36,8 @@ class EditFormPrivat(FlaskForm):  # Теж треба бд
     # бд
     password = PasswordField('Пароль', validators=[DataRequired('Не може бути пусте')])
     email = StringField('Почта', validators=[DataRequired('Не може бути пусте'), Email(message='Email не існує')])
+    recomendation = StringField('Вам подобаеться',
+                                validators=[DataRequired('Наприклад: Футбол, Програмування, Мйнкрафт...')])
     submit = SubmitField('Підтвердити')  # Кнопка
 
 
@@ -56,7 +58,8 @@ class Search(FlaskForm):
     submit = SubmitField('Пошук!')
 
 class Community(FlaskForm):
-    name = TextAreaField('Користувач', validators=[DataRequired('Не може бути пусте')])
+    name = TextAreaField('Назва Комюніті', validators=[Length(min=0, max=400, message='За над то багато символив'),
+                                                       DataRequired('Не може бути пусте')])
     tema = TextAreaField('Тема', validators=[Length(min=0, max=400, message='За над то багато символив'),
                                              DataRequired('Не може бути пусте')])
     description = TextAreaField('Опис', validators=[Length(min=0, max=500, message='За над то багато символив'),

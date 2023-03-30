@@ -14,8 +14,8 @@
             <a href="/" class="me-auto nav-link px-2 link-light">Головна</a>
             <form class="col-lg-auto d-none d-sm-block mb-lg-0 me-3 align-items-end" method="post" action="{{ url_for('search') }}">
                 {{ form.hidden_tag() }}
-                <input type="search" name="search_field" class="form-control d-inline" placeholder="Пошук" aria-label="Search">
-                <input type="submit" name="search" class="form-control d-inline" id="search">
+                <input type="search" name="search_field" class="search d-inline" placeholder="Пошук" aria-label="Search">
+                <input type="submit" name="search" class="search d-inline" id="search">
             </form>
             {% if current_user.is_authenticated %}
                 <div class="dropdown text-end">
@@ -36,7 +36,7 @@
                     </div>
                 </div>
             {% else %}
-                <a href="/login" class="nav-link px-2 link-light">Вхід</a>
+                <a href="/log_in" class="nav-link px-2 link-light">Вхід</a>
             {% endif %}
     </header>
     <div class="container">
