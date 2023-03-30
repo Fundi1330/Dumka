@@ -49,6 +49,8 @@ class Community(db.Model):
     description = db.Column(db.String(300), index=True, nullable=False)
     themes = db.Column(ARRAY(db.String), nullable=False)
     community = db.relationship('Post', backref='community', lazy='dynamic')
+    avatar = db.Column(db.String, default='communities/default.png', nullable=False)
+    author = db.Column(db.String, nullable=False)
 
     def __repr__(self) -> str:
         return '<Community{}'.format(self.name)
