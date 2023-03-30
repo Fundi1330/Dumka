@@ -3,13 +3,13 @@ from flask_login import LoginManager, login_user, logout_user, current_user
 from .models import User, Post, Community, db, Comment, Roles
 from flask_migrate import Migrate
 from .forms import Posts as PostForm
-from .forms import EditForm, EditFormPrivat, Registration, Login, Search
+from .forms import EditForm, EditFormPrivat, Registration, LoginForm, Search
 from .forms import Comment as CommentForm
 from .forms import Community as CommunityForm
 from flask_admin import Admin, helpers
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.contrib.fileadmin import FileAdmin
-from os import path, getcwd
+from os import path
 import datetime
 from re import findall
 from sqlalchemy import desc
@@ -17,6 +17,8 @@ from flask_ckeditor import CKEditor
 from flask_security import Security, SQLAlchemyUserDatastore
 from flask_security.utils import encrypt_password
 from werkzeug.utils import secure_filename
+
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'StandWithUkraine'
@@ -26,21 +28,17 @@ app.config['CKEDITOR_PKG_TYPE'] = 'standard'
 app.config['CKEDITOR_ENABLE_CODESNIPPET'] = True
 app.config['SECURITY_PASSWORD_HASH'] = 'pbkdf2_sha512'
 app.config['SECURITY_PASSWORD_SALT'] = 'admin_password'
-app.config['UPLOADED_PHOTOS_DEST'] = getcwd()
-app.config['UPLOAD_FOLDER'] = path.join(path.dirname(file), 'static/images')
-UPLOAD_FOLDER = path.join(path.dirname(__file__), 'static/images')
-
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+app.config['UPLOAD_FOLDER'] = path.join(path.dirname(__file__), 'static\\images\\')
 
 ckeditor = CKEditor(app)
-path = path.join(path.dirname(__file__), 'static')
+save_path = path.join(path.dirname(__file__), 'static')
 
 db.init_app(app)
 migrate = Migrate(app, db)
 
 login = LoginManager(app)
 
-admin = Admin(app, "OP", url='/admin')  # поки без паролю
+admin = Admin(app, "OP", url='/admin')       #поки без паролю
 
 user_datastore = SQLAlchemyUserDatastore(db, User, Roles)
 security = Security(app, user_datastore)
@@ -50,14 +48,12 @@ security = Security(app, user_datastore)
 def load_user(id):
     return User.query.get(int(id))
 
-
 @app.route('/logout')
 def logout():
     logout_user()
     return redirect('index')
 
-
-@app.route('/', methods=['GET', 'POST'])  # Головна сторінка
+@app.route('/', methods=['GET', 'POST']) #Головна сторінка
 @app.route('/index/', methods=['GET', 'POST'])
 def main():
     posts = Post.query.order_by(desc(Post.date_of_publication)).all()
@@ -71,24 +67,21 @@ def main():
                     recomended_communities.append(i)
     if form.validate_on_submit() and current_user.is_authenticated:
         tags = findall('[a-z]{1,}|[а-їґ]{1,}', form.tag.data.lower())
-        post = Post(theme=form.title.data, tags=tags, users=current_user, text=form.posts.data, likes=0,
-                    date_of_publication=datetime.datetime.now(), comments=[])
+        post = Post(theme=form.title.data, tags=tags, users=current_user, text=form.posts.data, likes=0, date_of_publication=datetime.datetime.now(), comments=[])
         db.session.add(post)
         db.session.commit()
         flash('Пост успішно доданий на сайт!', 'succes')
     elif not current_user.is_authenticated and form.validate_on_submit():
         flash('Спочатку вам потрібно зареєструватися!', 'error')
-    return render_template('index.html', title='Reddit', posts=posts, recomended_communities=recomended_communities,
-                           form=form)
+    return render_template('index.html', title='Reddit', posts=posts, recomended_communities=recomended_communities, form=form)
 
 
-@app.route('/singup', methods=['GET', 'POST'])  # Реєстрація
+@app.route('/singup', methods=['GET', 'POST']) #Реєстрація
 def signup():
     form = Registration()
     if form.validate_on_submit():
         interests = findall('[a-z]{1,}|[а-їґ]{1,}', form.recomendation.data.lower())
-        user = User(name=form.name.data, username=form.username.data, email=form.email.data,
-                    password_hash=form.password.data, interests=interests)
+        user = User(name=form.name.data, username=form.username.data, email=form.email.data, password_hash=form.password.data, interests=interests)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
@@ -96,12 +89,11 @@ def signup():
         return redirect(url_for('login'))
     return render_template('authorization/register.html', title='Реєстрація', form=form)
 
-
-@app.route('/log_in', methods=['GET', 'POST'])  # вхід на акк
+@app.route('/log_in', methods=['GET', 'POST']) #вхід на акк
 def login():
     if current_user.is_authenticated:
-        return redirect('index')
-    form = Login()
+       return redirect('index')
+    form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
@@ -111,8 +103,7 @@ def login():
         return redirect('index')
     return render_template('authorization/login.html', title='Вхід', form=form)
 
-
-@app.route('/user/<username>', methods=['GET', 'POST'])  # декоратор для перегляду профілю
+@app.route('/user/<username>', methods=['GET', 'POST']) #декоратор для перегляду профілю
 def user(username):
     form = Search()
     user = User.query.filter_by(username=username).first()
@@ -121,7 +112,6 @@ def user(username):
 
     return render_template('users/profile.html', title=username, user=user, posts=posts, form=form,
                            user_communities=user_communities)
-
 
 @app.route('/editpost/<int:id>', methods=['GET', 'POST'])
 def edit_post(id):
@@ -142,7 +132,6 @@ def edit_post(id):
         return redirect('/index')
     return render_template('posts/edit_post.html', title='Зміни свій пост', form=form_P, post=post)
 
-
 @app.route('/post/<int:id>', methods=['GET', 'POST'])
 def post(id):
     post = Post.query.filter_by(id=id).first()
@@ -151,8 +140,7 @@ def post(id):
     form = CommentForm()
 
     if form.validate_on_submit() and current_user.is_authenticated:
-        comment = Comment(author=current_user.username, text=form.comets.data,
-                          date_of_publication=datetime.datetime.now(), post_id=post.id)
+        comment = Comment(author=current_user.username, text=form.comets.data, date_of_publication=datetime.datetime.now(), post_id=post.id)
         db.session.add(comment)
         db.session.commit()
         flash('Комментар успішно доданий на сайт!', 'succes')
@@ -169,12 +157,10 @@ def post(id):
 
     return render_template('posts/post.html', title='Пост', post=post, form=form, comments=ordered_comments)
 
-
 @app.route('/faq')
 def faq():
     form = Search()
     return render_template('footer/faq.html', title='Faq', form=form)
-
 
 @app.route('/about_us')
 def about_us():
@@ -182,8 +168,7 @@ def about_us():
     return render_template('footer/about_us.html', title="About us", form=form)
 
 def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 @app.route('/editform', methods=['GET', 'POST'])
@@ -206,7 +191,8 @@ def edit_form():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(user.avatar)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            user.avatar = filename
+            file.save(path.join(app.config['UPLOAD_FOLDER'] + 'avatars\\', filename))
             db.session.commit()
 
         return redirect(url_for('user', username=current_user.username))
@@ -229,7 +215,6 @@ def edit_form_privat():
         return redirect(url_for('user', username=current_user.username))
     return render_template('users/edit_private_data.html', title='Зміна особистих данних', form=form_EFP)
 
-
 @app.route('/search', methods=['POST', 'GET'])
 def search():
     form = Search()
@@ -248,6 +233,7 @@ def search():
         if text_theme2 == []:
             flash('За вашим запитом нічого не зднайдено', 'error')
 
+
     return render_template('search.html', form=form, title='Пошук', text_theme=text_theme2)
 
 
@@ -261,7 +247,6 @@ def add_community():
         db.session.commit()
 
     return render_template('communities/add_community.html', title='''Додавання ком'юніті''', form=form)
-
 
 @app.route('/editcommunity/<int:id>', methods=['GET', 'POST'])
 def edit_community(id):
@@ -282,13 +267,12 @@ def edit_community(id):
 
     return render_template('communities/edit_community.html', title='''Зміна вашого ком'юніті''', form=form)
 
-
 with app.app_context():
     db.create_all()
     user_datastore.find_or_create_role(name='admin', description='Administrator')
     user_datastore.find_or_create_role(name='user', description='Regular user')
 
-    encrypted_password = encrypt_password('admin_dumka')  # replace password
+    encrypted_password = encrypt_password('admin_dumka') # replace password
     if not user_datastore.get_user('admin@dumka.com'):
         user_datastore.create_user(email='admin@dumka.com', password_hash=encrypted_password, username='admin')
 
@@ -305,25 +289,23 @@ def security_context_processor():
         admin_base_template=admin.base_template,
         admin_view=admin.index_view,
         h=helpers,
-    )
+)
 
-
-@app.route('/community/<com>')  # Сабреддіт
+@app.route('/community/<com>') #Сабреддіт
 def kind(com):
     form = Search()
-    communiti = Community.query.filter_by(name=com).first()
-    return render_template('kind.html', title='Сабреддіт', form=form, communiti=communiti)
-
+    community = Community.query.filter_by(name=com).first()
+    return render_template('kind.html', title='Сабреддіт', form=form, community=community)
 
 class UserModelView(ModelView):
-    def is_accessible(self):
-        return (current_user.is_active and
-                current_user.is_authenticated)
+  def is_accessible(self):
+    return (current_user.is_active and
+            current_user.is_authenticated)
 
-
-admin.add_view(FileAdmin(path, '/static/', name='files'))
+admin.add_view(FileAdmin(save_path, '/static/', name='files'))
 admin.add_view(UserModelView(User, db.session, name='Користувачі'))
 admin.add_view(UserModelView(Community, db.session, name='''Ком'юніті'''))
 admin.add_view(UserModelView(Roles, db.session, name='Ролі'))
 admin.add_view(UserModelView(Comment, db.session, name='Коменти'))
 admin.add_view(UserModelView(Post, db.session, name='Пости'))
+
