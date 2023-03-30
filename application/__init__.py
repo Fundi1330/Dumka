@@ -9,13 +9,16 @@ from .forms import Community as CommunityForm
 from flask_admin import Admin, helpers
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.contrib.fileadmin import FileAdmin
-from os import path, getcwd
+from os import path
 import datetime
 from re import findall
 from sqlalchemy import desc
 from flask_ckeditor import CKEditor
 from flask_security import Security, SQLAlchemyUserDatastore
 from flask_security.utils import encrypt_password
+from werkzeug.utils import secure_filename
+
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'StandWithUkraine'
@@ -25,10 +28,10 @@ app.config['CKEDITOR_PKG_TYPE'] = 'standard'
 app.config['CKEDITOR_ENABLE_CODESNIPPET'] = True
 app.config['SECURITY_PASSWORD_HASH'] = 'pbkdf2_sha512'
 app.config['SECURITY_PASSWORD_SALT'] = 'admin_password'
-app.config['UPLOADED_PHOTOS_DEST'] = getcwd()
+app.config['UPLOAD_FOLDER'] = path.join(path.dirname(__file__), 'static\\images\\')
 
 ckeditor = CKEditor(app)
-path = path.join(path.dirname(__file__), 'static')
+save_path = path.join(path.dirname(__file__), 'static')
 
 db.init_app(app)
 migrate = Migrate(app, db)
@@ -105,8 +108,10 @@ def user(username):
     form = Search()
     user = User.query.filter_by(username=username).first()
     posts = Post.query.filter_by(author=username).order_by(desc(Post.date_of_publication)).all()
-    
-    return render_template('users/profile.html', title=username, user=user, posts=posts, form=form)
+    user_communities = Community.query.filter_by(author=username).all()
+
+    return render_template('users/profile.html', title=username, user=user, posts=posts, form=form,
+                           user_communities=user_communities)
 
 @app.route('/editpost/<int:id>', methods=['GET', 'POST'])
 def edit_post(id):
@@ -162,6 +167,10 @@ def about_us():
     form = Search()
     return render_template('footer/about_us.html', title="About us", form=form)
 
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
 @app.route('/editform', methods=['GET', 'POST'])
 def edit_form():
     user = User.query.filter_by(id=current_user.id).first()
@@ -170,12 +179,26 @@ def edit_form():
         form_EF.name.data = user.name
         form_EF.about_me.data = user.about_me
 
+
     if form_EF.validate_on_submit():
         user.name = form_EF.name.data
         user.about_me = form_EF.about_me.data
-        db.session.commit()
+        file = form_EF.avatar.data
+        if 'file' is None:
+            flash('Ви що, захворіли?', 'error')
+        if file.filename == '':
+            flash('Ви не вибрали файл', 'error')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(user.avatar)
+            user.avatar = filename
+            file.save(path.join(app.config['UPLOAD_FOLDER'] + 'avatars\\', filename))
+            db.session.commit()
+
         return redirect(url_for('user', username=current_user.username))
+
     return render_template('users/edit_profile.html', title='Зміна данних', form=form_EF)
+
 
 @app.route('/editformprivate', methods=['GET', 'POST'])
 def edit_form_privat():
@@ -271,14 +294,15 @@ def security_context_processor():
 @app.route('/community/<com>') #Сабреддіт
 def kind(com):
     form = Search()
-    return render_template('kind.html', title='Сабреддіт', form=form)
+    community = Community.query.filter_by(name=com).first()
+    return render_template('kind.html', title='Сабреддіт', form=form, community=community)
 
 class UserModelView(ModelView):
   def is_accessible(self):
     return (current_user.is_active and
             current_user.is_authenticated)
 
-admin.add_view(FileAdmin(path, '/static/', name='files'))
+admin.add_view(FileAdmin(save_path, '/static/', name='files'))
 admin.add_view(UserModelView(User, db.session, name='Користувачі'))
 admin.add_view(UserModelView(Community, db.session, name='''Ком'юніті'''))
 admin.add_view(UserModelView(Roles, db.session, name='Ролі'))

@@ -20,7 +20,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(120), index=True, unique=True)
     email = db.Column(db.String(60), index=True, unique=True)
     password_hash = db.Column(db.String)
-    about_me = db.Column(db.String, index=True)
+    about_me = db.Column(db.String(500), index=True)
     interests = db.Column(ARRAY(db.String))
     posts = db.relationship('Post', backref='users', lazy='dynamic', primaryjoin="User.username == Post.author")
     avatar = db.Column(db.String, default='default.png')
@@ -54,9 +54,11 @@ class Community(db.Model):
     __tablename__ = 'Community'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, index=True)
-    description = db.Column(db.String(300), index=True)
+    description = db.Column(db.String(500), index=True)
     themes = db.Column(ARRAY(db.String))
     community = db.relationship('Post', backref='community', lazy='dynamic')
+    avatar = db.Column(db.String, default='communities/default.png')
+    author = db.Column(db.String(120))
 
     def __repr__(self) -> str:
         return '<Community{}'.format(self.name)

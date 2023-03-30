@@ -103,20 +103,25 @@ label {
     border-radius: .1875rem;
 }
 .user-data {
-    flex-grow: 0;
-    flex-shrink: 0;
-    flex-basis: 30%;
     border: #72ee72 solid .125rem;
     border-radius: 1%;
-    height: fit-content;
+    /* height: fit-content; */
     padding: 1.25rem;
     text-align: center;
 }
-.user-posts {
-    flex-grow: 0;
-    flex-shrink: 0;
-    flex-basis: 70%;
+.user-communities {
+    border: #727de0 solid .125rem;
+    border-radius: 1%;
+    /* height: fit-content; */
+    padding: 1.25rem;
+    text-align: center;
 }
+/* .user-posts {
+    width: 68%;
+}
+.user-info {
+    width: 32%;
+} */
 .post__body ul {
     list-style-type: circle!important;
 }
@@ -134,4 +139,7 @@ label {
     appearance: none;
     border-radius: 0.375rem;
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+.post__body p img {
+    width: 100%;
 }

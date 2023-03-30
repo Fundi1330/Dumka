@@ -28,16 +28,13 @@ class EditForm(FlaskForm):  # Для того щоб миняти імя и тд
     avatar = FileField('Аватарка')  # Аватарка == Назва файла
     submit = SubmitField('Підтвердити')  # Кнопка
 
-    def avatar(self, size):
-        return """Силка на фото""" + md5(self.email).hexdigest() + '?d=mm&s=' + str(size)
-
 
 class EditFormPrivat(FlaskForm):  # Теж треба бд
     # бд
     password = PasswordField('Пароль', validators=[DataRequired('Не може бути пусте')])
     email = StringField('Почта', validators=[DataRequired('Не може бути пусте'), Email(message='Email не існує')])
     recomendation = StringField('Вам подобаеться',
-                                validators=[DataRequired('Наприклад: Футбол, Програмування, Мйнкрафт...')])
+                                validators=[DataRequired('Наприклад: Футбол, Програмування, Мaйнкрафт...')])
     submit = SubmitField('Підтвердити')  # Кнопка
 
 

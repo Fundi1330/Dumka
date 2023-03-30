@@ -10,7 +10,7 @@
 </head>
 <body>
     <header class="header bg-primary mb-3 sticky-top">
-        <nav class="navbar navbar-dark bg-primary h-100 px-5 d-flex bd-highlight">
+        <nav class="navbar navbar-expand navbar-dark bg-primary h-100 px-5 d-flex bd-highlight">
             <a href="/" class="me-auto nav-link px-2 link-light">Головна</a>
             <form class="col-lg-auto d-none d-sm-block mb-lg-0 me-3 align-items-end" method="post" action="{{ url_for('search') }}">
                 {{ form.hidden_tag() }}
