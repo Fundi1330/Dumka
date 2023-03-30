@@ -9,15 +9,15 @@ db = SQLAlchemy()
 
 class User(db.Model, UserMixin):
     __tablename__ = 'User'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, index=True)
-    username = db.Column(db.String(120), index=True, unique=True)
-    email = db.Column(db.String(60), index=True, unique=True)
-    password_hash = db.Column(db.String(120))
-    about_me = db.Column(db.String, index=True)
-    interests = db.Column(ARRAY(db.String))
-    posts = db.relationship('Post', backref='users', lazy='dynamic', primaryjoin="User.username == Post.author")
-    avatar = db.Column(db.String, default='default.png')
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    name = db.Column(db.String, index=True, nullable=False)
+    username = db.Column(db.String(120), index=True, unique=True, nullable=False)
+    email = db.Column(db.String(60), index=True, unique=True, nullable=False)
+    password_hash = db.Column(db.String(120), nullable=False)
+    about_me = db.Column(db.String, index=True, nullable=True)
+    interests = db.Column(ARRAY(db.String), nullable=False)
+    posts = db.relationship('Post', backref='users', lazy='dynamic', primaryjoin="User.username == Post.author", nullable=False)
+    avatar = db.Column(db.String, default='default.png', nullable=False)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -29,14 +29,14 @@ class User(db.Model, UserMixin):
 class Post(db.Model):
     __tablename__ = 'Post'
     id = db.Column(db.Integer, primary_key=True)
-    theme = db.Column(db.String(60))
-    text = db.Column(db.String(4000))
-    date_of_publication = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    tags = db.Column(ARRAY(db.String))
+    theme = db.Column(db.String(60), nullable=False)
+    text = db.Column(db.String(4000), nullable=False)
+    date_of_publication = db.Column(db.DateTime, index=True, default=datetime.utcnow, nullable=False)
+    tags = db.Column(ARRAY(db.String), nullable=False)
     author = db.Column(db.String, db.ForeignKey('user.id'), nullable=False)
-    likes = db.Column(db.Integer, index=True)
+    likes = db.Column(db.Integer, index=True, nullable=False)
     comments = db.relationship('Comment', backref='comment', lazy='dynamic')
-
+    posts = db.Column(db.Integer, db.ForeignKey('community.id'))
 
     def __repr__(self) -> str:
         return '<Post {}'.format(self.author)
@@ -44,21 +44,36 @@ class Post(db.Model):
 
 class Community(db.Model):
     __tablename__ = 'Community'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, index=True)
-    description = db.Column(db.String(300), index=True)
-    themes = db.Column(ARRAY(db.String))
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    name = db.Column(db.String, index=True, nullable=False)
+    description = db.Column(db.String(300), index=True, nullable=False)
+    themes = db.Column(ARRAY(db.String), nullable=False)
+    community = db.relationship('Post', backref='community', lazy='dynamic')
 
     def __repr__(self) -> str:
         return '<Community{}'.format(self.name)
 
 class Comment(db.Model):
     __tablename__ = 'Comment'
-    id = db.Column(db.Integer, primary_key=True)
-    post = db.Column(db.Integer, db.ForeignKey('post.id'))
-    author = db.Column(db.String, index=True)
-    text = db.Column(db.String(1500), index=True)
-    date_of_publication = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    post = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
+    author = db.Column(db.String, index=True, nullable=False)
+    text = db.Column(db.String(1500), index=True, nullable=False)
+    date_of_publication = db.Column(db.DateTime, index=True, default=datetime.utcnow, nullable=False)
 
     def __repr__(self) -> str:
         return '<Comment{}'.format(self.author)
+
+class Role(db.Model):
+    __tablename__ = 'Role'
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    name = db.Column(db.String, index=True, nullable=False)
+    description = db.Column(db.String, index=True, nullable=False)
+
+    def __repr__(self) -> str:
+        return f'Role {self.name}'
+
+user_roles = db.table("user_roles",
+    db.Column('user_id', db.Integer, db.ForeignKey('User.id')),
+    db.Column('role_id', db.Integer, db.ForeignKey('Role.id'))
+)
