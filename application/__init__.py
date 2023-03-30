@@ -3,7 +3,7 @@ from flask_login import LoginManager, login_user, logout_user, current_user
 from .models import User, Post, Community, db, Comment, Roles
 from flask_migrate import Migrate
 from .forms import Posts as PostForm
-from .forms import EditForm, EditFormPrivat, Registration, LoginForm, Search
+from .forms import EditForm, EditFormPrivat, Registration, Login, Search
 from .forms import Comment as CommentForm
 from .forms import Community as CommunityForm
 from flask_admin import Admin, helpers
@@ -112,8 +112,10 @@ def user(username):
     form = Search()
     user = User.query.filter_by(username=username).first()
     posts = Post.query.filter_by(author=username).order_by(desc(Post.date_of_publication)).all()
+    user_communities = Community.query.filter_by(author=username).all()
 
-    return render_template('users/profile.html', title=username, user=user, posts=posts, form=form)
+    return render_template('users/profile.html', title=username, user=user, posts=posts, form=form,
+                           user_communities=user_communities)
 
 
 @app.route('/editpost/<int:id>', methods=['GET', 'POST'])
@@ -182,10 +184,13 @@ def edit_form():
     if request.method == 'GET':
         form_EF.name.data = user.name
         form_EF.about_me.data = user.about_me
+        form_EF.avatar.data = user.avatar
 
     if form_EF.validate_on_submit():
         user.name = form_EF.name.data
         user.about_me = form_EF.about_me.data
+        user.avatar.data = form_EF.avatar.data
+
         db.session.commit()
         return redirect(url_for('user', username=current_user.username))
     return render_template('users/edit_profile.html', title='Зміна данних', form=form_EF)
@@ -288,7 +293,8 @@ def security_context_processor():
 @app.route('/community/<com>')  # Сабреддіт
 def kind(com):
     form = Search()
-    return render_template('kind.html', title='Сабреддіт', form=form)
+    communiti = Community.query.filter_by(name=com).first()
+    return render_template('kind.html', title='Сабреддіт', form=form, communiti=communiti)
 
 
 class UserModelView(ModelView):
