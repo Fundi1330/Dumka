@@ -16,6 +16,7 @@ from sqlalchemy import desc
 from flask_ckeditor import CKEditor
 from flask_security import Security, SQLAlchemyUserDatastore
 from flask_security.utils import encrypt_password
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'StandWithUkraine'
@@ -26,6 +27,10 @@ app.config['CKEDITOR_ENABLE_CODESNIPPET'] = True
 app.config['SECURITY_PASSWORD_HASH'] = 'pbkdf2_sha512'
 app.config['SECURITY_PASSWORD_SALT'] = 'admin_password'
 app.config['UPLOADED_PHOTOS_DEST'] = getcwd()
+app.config['UPLOAD_FOLDER'] = path.join(path.dirname(file), 'static/images')
+UPLOAD_FOLDER = path.join(path.dirname(__file__), 'static/images')
+
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
 ckeditor = CKEditor(app)
 path = path.join(path.dirname(__file__), 'static')
@@ -96,7 +101,7 @@ def signup():
 def login():
     if current_user.is_authenticated:
         return redirect('index')
-    form = LoginForm()
+    form = Login()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
@@ -176,6 +181,10 @@ def about_us():
     form = Search()
     return render_template('footer/about_us.html', title="About us", form=form)
 
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 @app.route('/editform', methods=['GET', 'POST'])
 def edit_form():
@@ -184,15 +193,24 @@ def edit_form():
     if request.method == 'GET':
         form_EF.name.data = user.name
         form_EF.about_me.data = user.about_me
-        form_EF.avatar.data = user.avatar
+
 
     if form_EF.validate_on_submit():
         user.name = form_EF.name.data
         user.about_me = form_EF.about_me.data
-        user.avatar.data = form_EF.avatar.data
+        file = form_EF.avatar.data
+        if 'file' is None:
+            flash('Ви що, захворіли?', 'error')
+        if file.filename == '':
+            flash('Ви не вибрали файл', 'error')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(user.avatar)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            db.session.commit()
 
-        db.session.commit()
         return redirect(url_for('user', username=current_user.username))
+
     return render_template('users/edit_profile.html', title='Зміна данних', form=form_EF)
 
 
