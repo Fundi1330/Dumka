@@ -44,11 +44,11 @@ user_datastore = SQLAlchemyUserDatastore(db, User, Roles)
 security = Security(app, user_datastore)
 
 
-@login.user_loader
+@login.user_loader            #Загрузка користувача
 def load_user(id):
     return User.query.get(int(id))
 
-@app.route('/logout')
+@app.route('/logout')         #Вихід з аккаунта
 def logout():
     logout_user()
     return redirect('index')
@@ -238,16 +238,6 @@ def search():
     return render_template('search.html', form=form, title='Пошук', text_theme=text_theme2)
 
 
-@app.route('/addcommunity', methods=['GET', 'POST'])
-def add_community():
-    form = CommunityForm()
-    if form.validate_on_submit():
-        tags = findall('[a-z]{1,}|[а-їґ]{1,}', form.tema.data.lower())
-        community = Community(name=form.name.data, description=form.description.data, themes=tags)
-        db.session.add(community)
-        db.session.commit()
-
-    return render_template('communities/add_community.html', title='''Додавання ком'юніті''', form=form)
 
 @app.route('/editform', methods=['GET', 'POST'])
 def edit_form():
@@ -279,16 +269,66 @@ def edit_form():
 
     return render_template('users/edit_profile.html', title='Зміна данних', form=form_EF)
 
+@app.route('/addcommunity', methods=['GET', 'POST'])
+def add_community():
+    form = CommunityForm()
+    if form.validate_on_submit():
+        tags = findall('[a-z]{1,}|[а-їґ]{1,}', form.tema.data.lower())
+        community = Community(name=form.name.data, description=form.description.data, themes=tags)
+        file = form.photo.data
+        if 'file' is None:
+            flash('Ви що, захворіли?', 'error')
+        if file.filename == '':
+            flash('Ви не вибрали файл', 'error')
+            return redirect(request.url)
+        if file and allowed_file(file.filename) and file.filename != user.avatar:
+            filename = secure_filename(file.filename)
+            user.avatar = filename
+            file.save(path.join(app.config['UPLOAD_FOLDER'] + 'avatars\\community\\', filename))
+            db.session.commit()
+            flash('Аватарку успішно змінено!', 'succes')
+        db.session.add(community)
+        db.session.commit()
+
+    return render_template('communities/add_community.html', title='''Додавання ком'юніті''', form=form)
+
 @app.route('/community/<int:id>', methods=['GET', 'POST']) #Сабреддіт
 def communinti(id):
     form = CommunityForm()
     community = Community.query.filter_by(id=id).first()
     community_posts = Post.query.filter_by(posts=id).all()
     if form.validate_on_submit():
-        communityyy = Post(themes=form.tema.data, description=form.description.data, author=current_user.username, name=form.name.data, posts=id)
+        communityyy = Community(themes=form.tema.data, description=form.description.data, author=current_user.username, name=form.name.data, posts=id)
         db.session.add(communityyy)
         db.session.commit()
     return render_template('communities/community.html', title='Сабреддіт', form=form, community=community, community_posts=community_posts)
+
+@app.route('/editcommuniti/<int:id>', methods=['GET', 'POST'])
+def edit_communiti(id):
+    user = User.query.filter_by(id=current_user.id).first()
+    form = CommunityForm()
+    communiti = Community.query.filter_by(id=id).first()
+    if form.validate_on_submit():
+        communiti.themes = form.tema.data
+        communiti.description = form.description.data
+        communiti.name = form.name.data
+        file = form.photo.data
+        if 'file' is None:
+            flash('Ви що, захворіли?', 'error')
+        if file.filename == '':
+            flash('Ви не вибрали файл', 'error')
+            return redirect(request.url)
+        if file and allowed_file(file.filename) and file.filename != user.avatar:
+            filename = secure_filename(file.filename)
+            user.avatar = filename
+            file.save(path.join(app.config['UPLOAD_FOLDER'] + 'avatars\\community\\', filename))
+            db.session.commit()
+            flash('Аватарку успішно змінено!', 'succes')
+
+        return redirect(url_for('user', username=current_user.username))
+    return render_template('communities/edi_communiti', title='''Зміни ком'юніті''', form=form)
+
+
 
 with app.app_context():
     db.create_all()
