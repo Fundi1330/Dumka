@@ -30,7 +30,7 @@
             {% for community in recomended_communities %}
                 <a href="/community/{{ community.id }}" class="text-decoration-none text-black">
                     <div class="border border-info rounded p-3 my-3">
-                        <img src="{{ url_for('static', filename='images/avatars/') }}{{ community.avatar }}" alt="{{ community.name }}" height="100" class="rounded-circle">
+                        <img src="{{ url_for('static', filename='images/avatars/community/') }}{{ community.avatar }}" alt="{{ community.name }}" height="100" class="rounded-circle">
                         <h2 class="recomended__item">{{ community.name }}</h2>
                         <p>{{ community.description }}</p>
                     </div>

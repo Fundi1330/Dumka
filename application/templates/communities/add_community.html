@@ -15,7 +15,15 @@
         {% endfor %}
         {{ form.tema.label }}
         {{ form.tema(class_='form-control') }}
-        {{ form.submit(class_='form-control') }}
+        {% for error in form.tema.errors %}
+            <p style="color: red;">[{{error}}]</p>
+        {% endfor %}
+        {{ form.avatar.label }}
+        {{ form.avatar(class_='form-control') }}
+        {% for error in form.avatar.errors %}
+            <p style="color: red;">[{{error}}]</p>
+        {% endfor %}
+        {{ form.submit(class_='form-control my-3') }}
     </form>
 </div>
 {% endblock %}

@@ -55,9 +55,19 @@
     </section>
     <div class="user-info col">
         <section class="user-data">
-            <img src="{{ url_for('static', filename='images/avatars/') }}{{ community.avatar }}" height="100" alt="{{ community.name }}" class="rounded-circle">
+            <img src="{{ url_for('static', filename='images/avatars/community/') }}{{ community.avatar }}" height="100" alt="{{ community.name }}" class="rounded-circle">
             <h3>Ім'я: {{ community.name }}</h3>
             <p>{{ community.description }}</p>
+            {% if current_user.username == community.author %}
+                <form action="" method="post">
+                    <label class="delete">
+                        <input type="submit" name="delete" />
+                    </label>
+                    <label class="edit">
+                        <input type="submit" name="edit" />
+                    </label>
+                </form>
+            {% endif %}
         </section>
     </div>
 </div>

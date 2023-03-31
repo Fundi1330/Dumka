@@ -61,6 +61,6 @@ class Community(FlaskForm):
                                              DataRequired('Не може бути пусте')])
     description = TextAreaField('Опис', validators=[Length(min=0, max=500, message='За над то багато символив'),
                                            DataRequired('Не може бути пусте')])
-    photo = FileField('Аватарка')  # Аватарка == Назва файла
+    avatar = FileField('Аватарка')  # Аватарка == Назва файла
 
     submit = SubmitField('Підтвердити')

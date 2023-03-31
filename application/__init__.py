@@ -72,6 +72,7 @@ def main():
         db.session.add(post)
         db.session.commit()
         flash('Пост успішно доданий на сайт!', 'succes')
+        return redirect('index')
     elif not current_user.is_authenticated and form.validate_on_submit():
         flash('Спочатку вам потрібно зареєструватися!', 'error')
     return render_template('index.html', title='Reddit', posts=posts, recomended_communities=recomended_communities, form=form)
@@ -145,6 +146,7 @@ def post(id):
         db.session.add(comment)
         db.session.commit()
         flash('Комментар успішно доданий на сайт!', 'succes')
+        return redirect(url_for('post', id=id))
     elif not current_user.is_authenticated and form.validate_on_submit():
         flash('Спочатку вам потрібно зареєструватися!', 'error')
 
@@ -245,9 +247,22 @@ def add_community():
     form = CommunityForm()
     if form.validate_on_submit():
         tags = findall('[a-z]{1,}|[а-їґ]{1,}', form.tema.data.lower())
-        community = Community(name=form.name.data, description=form.description.data, themes=tags)
-        db.session.add(community)
-        db.session.commit()
+        file = form.avatar.data
+        if 'file' is None:
+            flash('Ви що, захворіли?', 'error')
+        if file.filename == '':
+            flash('Ви не вибрали файл', 'error')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(path.join(app.config['UPLOAD_FOLDER'] + 'avatars\\community\\', filename))
+            db.session.commit()
+            community = Community(name=form.name.data, description=form.description.data, themes=tags, avatar=file.filename, author=current_user.username)
+            community.avatar = filename
+            db.session.add(community)
+            db.session.commit()
+            flash("Ком'юніті успішно створено!", 'succes')
+            return redirect(url_for('community', id=community.id))
 
     return render_template('communities/add_community.html', title='''Додавання ком'юніті''', form=form)
 
@@ -255,18 +270,33 @@ def add_community():
 def edit_community(id):
     community = Community.query.filter_by(id=id).first()
     form = CommunityForm()
-    if current_user.username != post.author:
+    if current_user.username != community.author:
         abort(403)
 
     if request.method == 'GET':
         form.name.data = community.name
-        form.tema.data = community.themes
+        form.tema.data = ', '.join(community.themes)
         form.description.data = community.description
 
     if form.validate_on_submit():
-        community.name = form.name.data
-        community.description = form.description.data
         community.themes = form.tema.data
+        community.description = form.description.data
+        community.name = form.name.data
+        file = form.photo.data
+        if 'file' is None:
+            flash('Ви що, захворіли?', 'error')
+        if file.filename == '':
+            flash('Ви не вибрали файл', 'error')
+            return redirect(request.url)
+        if file and allowed_file(file.filename) and file.filename != user.avatar:
+            filename = secure_filename(file.filename)
+            user.avatar = filename
+            file.save(path.join(app.config['UPLOAD_FOLDER'] + 'avatars\\community\\', filename))
+            db.session.commit()
+            flash('Аватарку успішно змінено!', 'succes')
+            return redirect(url_for('community', id=id))
+
+        return redirect(url_for('user', username=current_user.username))
 
     return render_template('communities/edit_community.html', title='''Зміна вашого ком'юніті''', form=form)
 
@@ -305,8 +335,18 @@ def communinti(id):
         db.session.add(post)
         db.session.commit()
         flash('Пост успішно доданий на сайт!', 'succes')
+        return redirect(url_for('community', id=id))
     elif not current_user.is_authenticated and form.validate_on_submit():
         flash('Спочатку вам потрібно зареєструватися!', 'error')
+
+    if 'delete' in request.form:
+        db.session.delete(community)
+        db.session.commit()
+        flash('''Ком'юніті успішно видалений''', 'succes')
+        return redirect('/')
+    elif 'edit' in request.form:
+        return redirect(url_for('edit_community', id=community.id))
+    
     return render_template('communities/community.html', title='Сабреддіт', form=form, community=community, community_posts=community_posts)
 
 class UserModelView(ModelView):
