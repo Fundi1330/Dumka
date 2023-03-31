@@ -301,6 +301,14 @@ def communinti(id):
         communityyy = Community(themes=form.tema.data, description=form.description.data, author=current_user.username, name=form.name.data, posts=id)
         db.session.add(communityyy)
         db.session.commit()
+
+    if 'delete' in request.form:
+        db.session.delete(community)
+        db.session.commit()
+        flash('''Ком'юніті успішно видалений''', 'succes')
+        return redirect('/')
+    elif 'edit' in request.form:
+        return redirect(url_for('editcommuniti', id=community.id))
     return render_template('communities/community.html', title='Сабреддіт', form=form, community=community, community_posts=community_posts)
 
 @app.route('/editcommuniti/<int:id>', methods=['GET', 'POST'])
