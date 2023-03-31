@@ -147,6 +147,7 @@ def post(id):
     elif not current_user.is_authenticated and form.validate_on_submit():
         flash('Спочатку вам потрібно зареєструватися!', 'error')
 
+
     if 'delete' in request.form:
         db.session.delete(post)
         db.session.commit()
@@ -248,24 +249,46 @@ def add_community():
 
     return render_template('communities/add_community.html', title='''Додавання ком'юніті''', form=form)
 
-@app.route('/editcommunity/<int:id>', methods=['GET', 'POST'])
-def edit_community(id):
-    community = Community.query.filter_by(id=id).first()
-    form = CommunityForm()
-    if current_user.username != post.author:
-        abort(403)
-
+@app.route('/editform', methods=['GET', 'POST'])
+def edit_form():
+    user = User.query.filter_by(id=current_user.id).first()
+    form_EF = EditForm()
     if request.method == 'GET':
-        form.name.data = community.name
-        form.tema.data = community.themes
-        form.description.data = community.description
+        form_EF.name.data = user.name
+        form_EF.about_me.data = user.about_me
+        form_EF.avatar.data = Image.open(path.join(app.config['UPLOAD_FOLDER'] + 'avatars\\', current_user.avatar))
 
+
+    if form_EF.validate_on_submit():
+        user.name = form_EF.name.data
+        user.about_me = form_EF.about_me.data
+        file = form_EF.avatar.data
+        if 'file' is None:
+            flash('Ви що, захворіли?', 'error')
+        if file.filename == '':
+            flash('Ви не вибрали файл', 'error')
+            return redirect(request.url)
+        if file and allowed_file(file.filename) and file.filename != user.avatar:
+            filename = secure_filename(file.filename)
+            user.avatar = filename
+            file.save(path.join(app.config['UPLOAD_FOLDER'] + 'avatars\\', filename))
+            db.session.commit()
+            flash('Аватарку успішно змінено!', 'succes')
+
+        return redirect(url_for('user', username=current_user.username))
+
+    return render_template('users/edit_profile.html', title='Зміна данних', form=form_EF)
+
+@app.route('/community/<int:id>', methods=['GET', 'POST']) #Сабреддіт
+def communinti(id):
+    form = CommunityForm()
+    community = Community.query.filter_by(id=id).first()
+    community_posts = Post.query.filter_by(posts=id).all()
     if form.validate_on_submit():
-        community.name = form.name.data
-        community.description = form.description.data
-        community.themes = form.tema.data
-
-    return render_template('communities/edit_community.html', title='''Зміна вашого ком'юніті''', form=form)
+        communityyy = Post(themes=form.tema.data, description=form.description.data, author=current_user.username, name=form.name.data, posts=id)
+        db.session.add(communityyy)
+        db.session.commit()
+    return render_template('communities/community.html', title='Сабреддіт', form=form, community=community, community_posts=community_posts)
 
 with app.app_context():
     db.create_all()
@@ -291,12 +314,7 @@ def security_context_processor():
         h=helpers,
 )
 
-@app.route('/community/<int:id>', methods=['GET', 'POST']) #Сабреддіт
-def kind(id):
-    form = Search()
-    community = Community.query.filter_by(id=id).first()
 
-    return render_template('communities/community.html', title='Сабреддіт', form=form, community=community)
 
 class UserModelView(ModelView):
   def is_accessible(self):
