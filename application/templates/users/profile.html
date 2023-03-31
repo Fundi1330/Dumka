@@ -32,7 +32,7 @@
     </section>
     <div class="user-info col">
         <section class="user-data m-4 d-block">
-            <img src="{{ url_for('static', filename='images/avatars/') }}{{ user.avatar }}" height="100" alt="{{ user.username }}">
+            <img src="{{ url_for('static', filename='images/avatars/') }}{{ user.avatar }}" height="100" alt="{{ user.username }}" class="rounded-circle">
             <h3>Ім'я: {{ user.name }}</h3>
             <h6>Нікнейм: {{ user.username }}</h6>
             {% if user.about_me %}

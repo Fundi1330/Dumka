@@ -27,6 +27,9 @@ class User(db.Model, UserMixin):
     active = db.Column(db.Boolean())
     roles = db.relationship('Roles', secondary=user_roles, backref='user', lazy=True)
 
+    def has_role(self, *args):
+        return set(args).issubset({role.name for role in self.roles})
+
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
     def check_password(self, password):

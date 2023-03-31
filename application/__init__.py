@@ -17,8 +17,9 @@ from flask_ckeditor import CKEditor
 from flask_security import Security, SQLAlchemyUserDatastore
 from flask_security.utils import encrypt_password
 from werkzeug.utils import secure_filename
+from PIL import Image
 
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'StandWithUkraine'
@@ -178,6 +179,7 @@ def edit_form():
     if request.method == 'GET':
         form_EF.name.data = user.name
         form_EF.about_me.data = user.about_me
+        form_EF.avatar.data = Image.open(path.join(app.config['UPLOAD_FOLDER'] + 'avatars\\', current_user.avatar))
 
 
     if form_EF.validate_on_submit():
@@ -189,11 +191,12 @@ def edit_form():
         if file.filename == '':
             flash('Ви не вибрали файл', 'error')
             return redirect(request.url)
-        if file and allowed_file(file.filename):
-            filename = secure_filename(user.avatar)
+        if file and allowed_file(file.filename) and file.filename != user.avatar:
+            filename = secure_filename(file.filename)
             user.avatar = filename
             file.save(path.join(app.config['UPLOAD_FOLDER'] + 'avatars\\', filename))
             db.session.commit()
+            flash('Аватарку успішно змінено!', 'succes')
 
         return redirect(url_for('user', username=current_user.username))
 
@@ -292,18 +295,33 @@ def security_context_processor():
 )
 
 @app.route('/community/<int:id>', methods=['GET', 'POST']) #Сабреддіт
-def kind(id):
-    form = Search()
+def communinti(id):
+    form = PostForm()
     community = Community.query.filter_by(id=id).first()
-
-    return render_template('communities/community.html', title='Сабреддіт', form=form, community=community)
+    community_posts = Post.query.filter_by(posts=id).order_by(desc(Post.date_of_publication)).all()
+    if form.validate_on_submit() and current_user.is_authenticated:
+        tags = findall('[a-z]{1,}|[а-їґ]{1,}', form.tag.data.lower())
+        post = Post(theme=form.title.data, tags=tags, users=current_user, text=form.posts.data, likes=0, date_of_publication=datetime.datetime.now(), comments=[], posts=id)
+        db.session.add(post)
+        db.session.commit()
+        flash('Пост успішно доданий на сайт!', 'succes')
+    elif not current_user.is_authenticated and form.validate_on_submit():
+        flash('Спочатку вам потрібно зареєструватися!', 'error')
+    return render_template('communities/community.html', title='Сабреддіт', form=form, community=community, community_posts=community_posts)
 
 class UserModelView(ModelView):
-  def is_accessible(self):
-    return (current_user.is_active and
-            current_user.is_authenticated)
+    def is_accessible(self):
+        return (current_user.is_active and
+                current_user.is_authenticated and
+                current_user.has_role('admin'))
+  
+class SecureFileView(FileAdmin):
+    def is_accessible(self):
+        return (current_user.is_active and
+                current_user.is_authenticated and
+                current_user.has_role('admin'))
 
-admin.add_view(FileAdmin(save_path, '/static/', name='Файли'))
+admin.add_view(SecureFileView(save_path, '/static/', name='Файли'))
 admin.add_view(UserModelView(User, db.session, name='Користувачі'))
 admin.add_view(UserModelView(Community, db.session, name='''Ком'юніті'''))
 admin.add_view(UserModelView(Roles, db.session, name='Ролі'))

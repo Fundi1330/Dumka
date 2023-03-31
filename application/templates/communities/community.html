@@ -1,6 +1,29 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="p-4 row">
+    <section class="write__post border border-success rounded p-4 mb-4">
+        <form action="" method="post" class="">
+            {{ form.hidden_tag() }}
+            {{ form.title.label }}
+            {{ form.title(class_='form-control m-2') }}
+            {% for error in form.title.errors %}
+                <p style="color: red;">[{{error}}]</p>
+            {% endfor %}
+            {{ form.posts.label }}
+            {{ form.posts(class_='form-control m-2') }}
+            {% for error in form.posts.errors %}
+                <p style="color: red;">[{{error}}]</p>
+            {% endfor %}
+            {{ form.tag.label }}
+            {{ form.tag(class_='form-control m-2') }}
+            {% for error in form.tag.errors %}
+                <p style="color: red;">[{{error}}]</p>
+            {% endfor %}
+            {{ form.submit(class_='btn btn-primary m-2')}}
+            {{ ckeditor.load(pkg_type="basic") }}
+            {{ ckeditor.config(name='posts') }}
+        </form>
+    </section>
     <section class="user-posts m-sm-4 col-12 col-md-7 d-inline-block m-xs-0">
         <h2>Пости:</h2>
         {% for post in community_posts %}
@@ -32,13 +55,9 @@
     </section>
     <div class="user-info col">
         <section class="user-data">
-            <img src="{{ url_for('static', filename='images/avatars/') }}{{ community.avatar }}" height="100" alt="{{ community.name }}">
+            <img src="{{ url_for('static', filename='images/avatars/') }}{{ community.avatar }}" height="100" alt="{{ community.name }}" class="rounded-circle">
             <h3>Ім'я: {{ community.name }}</h3>
             <p>{{ community.description }}</p>
-        </section>
-        <section class="user-communities m-4 d-block">
-            {% for user in community.users %}
-            {% endfor %}
         </section>
     </div>
 </div>
