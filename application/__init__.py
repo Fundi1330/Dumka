@@ -291,18 +291,19 @@ def security_context_processor():
         h=helpers,
 )
 
-@app.route('/community/<com>') #Сабреддіт
-def kind(com):
+@app.route('/community/<int:id>', methods=['GET', 'POST']) #Сабреддіт
+def kind(id):
     form = Search()
-    community = Community.query.filter_by(name=com).first()
-    return render_template('kind.html', title='Сабреддіт', form=form, community=community)
+    community = Community.query.filter_by(id=id).first()
+
+    return render_template('communities/community.html', title='Сабреддіт', form=form, community=community)
 
 class UserModelView(ModelView):
   def is_accessible(self):
     return (current_user.is_active and
             current_user.is_authenticated)
 
-admin.add_view(FileAdmin(save_path, '/static/', name='files'))
+admin.add_view(FileAdmin(save_path, '/static/', name='Файли'))
 admin.add_view(UserModelView(User, db.session, name='Користувачі'))
 admin.add_view(UserModelView(Community, db.session, name='''Ком'юніті'''))
 admin.add_view(UserModelView(Roles, db.session, name='Ролі'))

@@ -28,9 +28,13 @@
         <h2>Рекомендовані спільноти:</h2>
         {% if current_user.is_authenticated %}
             {% for community in recomended_communities %}
-                <div class="border border-info rounded p-3 my-3">
-                    <h2 class="recomended__item">{{ community.name }}</h2>
-                </div>
+                <a href="/community/{{ community.id }}" class="text-decoration-none text-black">
+                    <div class="border border-info rounded p-3 my-3">
+                        <img src="{{ url_for('static', filename='images/avatars/') }}{{ community.avatar }}" alt="{{ community.name }}" height="100">
+                        <h2 class="recomended__item">{{ community.name }}</h2>
+                        <p>{{ community.description }}</p>
+                    </div>
+                </a>
             {% endfor %}
         {% else %}
             <p>Щоб ми рекомендували вам ком'юніті, ви маєте бути зареєстровані!</p>
