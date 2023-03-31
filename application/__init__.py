@@ -15,7 +15,7 @@ from re import findall
 from sqlalchemy import desc
 from flask_ckeditor import CKEditor
 from flask_security import Security, SQLAlchemyUserDatastore
-from flask_security.utils import encrypt_password
+from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
 from PIL import Image
 
@@ -72,7 +72,7 @@ def main():
         db.session.add(post)
         db.session.commit()
         flash('Пост успішно доданий на сайт!', 'succes')
-        return redirect('index')
+
     elif not current_user.is_authenticated and form.validate_on_submit():
         flash('Спочатку вам потрібно зареєструватися!', 'error')
     return render_template('index.html', title='Reddit', posts=posts, recomended_communities=recomended_communities, form=form)
@@ -262,7 +262,7 @@ def add_community():
             db.session.add(community)
             db.session.commit()
             flash("Ком'юніті успішно створено!", 'succes')
-            return redirect(url_for('community', id=community.id))
+            return redirect('community/' + str(community.id))
 
     return render_template('communities/add_community.html', title='''Додавання ком'юніті''', form=form)
 
@@ -305,9 +305,9 @@ with app.app_context():
     user_datastore.find_or_create_role(name='admin', description='Administrator')
     user_datastore.find_or_create_role(name='user', description='Regular user')
 
-    encrypted_password = encrypt_password('admin_dumka') # replace password
+    encrypted_password = generate_password_hash('admin_dumka') # replace password
     if not user_datastore.get_user('admin@dumka.com'):
-        user_datastore.create_user(email='admin@dumka.com', password_hash=encrypted_password, username='admin')
+        user_datastore.create_user(email='admin@dumka.com', password_hash=encrypted_password, username='admin', interests=[])
 
     db.session.commit()
 
@@ -321,7 +321,7 @@ def security_context_processor():
     return dict(
         admin_base_template=admin.base_template,
         admin_view=admin.index_view,
-        h=helpers,
+        h=helpers
 )
 
 @app.route('/community/<int:id>', methods=['GET', 'POST']) #Сабреддіт
@@ -335,7 +335,7 @@ def communinti(id):
         db.session.add(post)
         db.session.commit()
         flash('Пост успішно доданий на сайт!', 'succes')
-        return redirect(url_for('community', id=id))
+        return redirect(str(community.id))
     elif not current_user.is_authenticated and form.validate_on_submit():
         flash('Спочатку вам потрібно зареєструватися!', 'error')
 
